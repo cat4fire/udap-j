@@ -84,8 +84,8 @@ public class TransactionExecutor {
 
     PrecompiledContracts.PrecompiledContract precompiledContract;
 
-    BigInteger m_endGas = BigInteger.ZERO;
-    long basicTxCost = 0;
+    //BigInteger m_endGas = BigInteger.ZERO;
+    //long basicTxCost = 0;
     List<LogInfo> logs = null;
 
     private ByteArraySet touchedAccounts = new ByteArraySet();
@@ -111,7 +111,7 @@ public class TransactionExecutor {
         this.currentBlock = currentBlock;
         this.listener = listener;
         this.gasUsedInTheBlock = gasUsedInTheBlock;
-        this.m_endGas = toBI(tx.getGasLimit());
+        //    this.m_endGas = toBI(tx.getGasLimit());
         withCommonConfig(CommonConfig.getDefault());
     }
 
@@ -133,7 +133,7 @@ public class TransactionExecutor {
      * set readyToExecute = true
      */
     public void init() {
-        basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
+        //basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
 
         //lycrus
         byte[] lycrusAddress = null;
@@ -152,10 +152,10 @@ public class TransactionExecutor {
             return;
         }
 
-        BigInteger txGasLimit = new BigInteger(1, tx.getGasLimit());
+        BigInteger txGasCost = new BigInteger(1, tx.getGasCost());
         BigInteger curBlockGasLimit = new BigInteger(1, currentBlock.getGasLimit());
 
-        boolean cumulativeGasReached = txGasLimit.add(BigInteger.valueOf(gasUsedInTheBlock)).compareTo(curBlockGasLimit) > 0;
+        boolean cumulativeGasReached = txGasCost.add(BigInteger.valueOf(gasUsedInTheBlock)).compareTo(curBlockGasLimit) > 0;
         if (cumulativeGasReached) {
 
             execError(String.format("Too much gas used in this block: Require: %s Got: %s", new BigInteger(1, currentBlock.getGasLimit()).longValue() - toBI(tx.getGasLimit()).longValue(), toBI(tx.getGasLimit()).longValue()));
@@ -163,14 +163,14 @@ public class TransactionExecutor {
             return;
         }
 
-        if (txGasLimit.compareTo(BigInteger.valueOf(basicTxCost)) < 0) {
+        /*if (txGasLimit.compareTo(BigInteger.valueOf(basicTxCost)) < 0) {
 
             execError(String.format("Not enough gas for transaction execution: Require: %s Got: %s", basicTxCost, txGasLimit));
 
             return;
-        }
+        }*/
 
-        BigInteger reqNonce = track.getNonce(tx.getSender());
+        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
         BigInteger txNonce = toBI(tx.getNonce());
         if (isNotEqual(reqNonce, txNonce)) {
             execError(String.format("Invalid nonce: required: %s , tx.nonce: %s", reqNonce, txNonce));
@@ -178,10 +178,9 @@ public class TransactionExecutor {
             return;
         }
 
-        BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
-        BigInteger totalCost = toBI(tx.getValue()).add(txGasCost);
+        BigInteger txEthCost = toBI(tx.getGasPrice()).multiply(txGasCost);
+        BigInteger totalCost = toBI(tx.getValue()).add(txEthCost);
         BigInteger senderBalance = track.getBalance(tx.getSender());
-//senderBalance = senderBalance.add(new BigInteger("15000000000000000000"))
         if (!isCovers(senderBalance, totalCost)) {
 
             execError(String.format("Not enough cash: Require: %s, Sender cash: %s", totalCost, senderBalance));

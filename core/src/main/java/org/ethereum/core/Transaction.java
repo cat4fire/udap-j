@@ -74,12 +74,6 @@ public class Transaction {
      * to the miner for each unit of gas */
     private byte[] gasPrice;
 
-    /* the amount of "gas" to allow for the computation.
-     * Gas is the fuel of the computational engine;
-     * every computational step taken and every byte added
-     * to the state or transaction list consumes some gas. */
-    private byte[] gasLimit;
-
     /* An unlimited size byte array specifying
      * input [data] of the message call or
      * Initialization code for a new contract */
@@ -105,16 +99,21 @@ public class Transaction {
      * from the RLP-encoded data */
     protected boolean parsed = false;
 
+    /**
+     * for each Tx, the function would have a fixed cost
+     */
+    private byte[] gasCost;
+
     public Transaction(byte[] rawData) {
         this.rlpEncoded = rawData;
         parsed = false;
     }
 
-    public Transaction(byte[] nonce, byte[] gasPrice, byte[] gasLimit, byte[] receiveAddress, byte[] value, byte[] data,
+    public Transaction(byte[] nonce, byte[] gasPrice, byte[] gasCost, byte[] receiveAddress, byte[] value, byte[] data,
                        Integer chainId) {
         this.nonce = nonce;
         this.gasPrice = gasPrice;
-        this.gasLimit = gasLimit;
+        this.gasCost = gasCost;
         this.receiveAddress = receiveAddress;
         if (ByteUtil.isSingleZero(value)) {
             this.value = EMPTY_BYTE_ARRAY;
@@ -203,7 +202,7 @@ public class Transaction {
 
             this.nonce = transaction.get(0).getRLPData();
             this.gasPrice = transaction.get(1).getRLPData();
-            this.gasLimit = transaction.get(2).getRLPData();
+            this.gasCost = transaction.get(2).getRLPData();
             this.receiveAddress = transaction.get(3).getRLPData();
             this.value = transaction.get(4).getRLPData();
             this.data = transaction.get(5).getRLPData();
@@ -229,7 +228,7 @@ public class Transaction {
         if (getNonce().length > HASH_LENGTH) throw new RuntimeException("Nonce is not valid");
         if (receiveAddress != null && receiveAddress.length != 0 && receiveAddress.length != ADDRESS_LENGTH)
             throw new RuntimeException("Receive address is not valid");
-        if (gasLimit.length > HASH_LENGTH)
+        if (gasCost.length > HASH_LENGTH)
             throw new RuntimeException("Gas Limit is not valid");
         if (gasPrice != null && gasPrice.length > HASH_LENGTH)
             throw new RuntimeException("Gas Price is not valid");
@@ -310,13 +309,13 @@ public class Transaction {
         parsed = true;
     }
 
-    public byte[] getGasLimit() {
+    public byte[] getGasCost() {
         rlpParse();
-        return gasLimit == null ? ZERO_BYTE_ARRAY : gasLimit;
+        return gasCost == null ? ZERO_BYTE_ARRAY : gasCost;
     }
 
     protected void setGasLimit(byte[] gasLimit) {
-        this.gasLimit = gasLimit;
+        this.gasCost = gasCost;
         parsed = true;
     }
 
@@ -421,7 +420,7 @@ public class Transaction {
         return "TransactionData [" + "hash=" + ByteUtil.toHexString(hash) +
                 "  nonce=" + ByteUtil.toHexString(nonce) +
                 ", gasPrice=" + ByteUtil.toHexString(gasPrice) +
-                ", gas=" + ByteUtil.toHexString(gasLimit) +
+                ", gasCost=" + ByteUtil.toHexString(gasCost) +
                 ", receiveAddress=" + ByteUtil.toHexString(receiveAddress) +
                 ", sendAddress=" + ByteUtil.toHexString(getSender()) +
                 ", value=" + ByteUtil.toHexString(value) +
@@ -449,21 +448,21 @@ public class Transaction {
             nonce = RLP.encodeElement(this.nonce);
         }
         byte[] gasPrice = RLP.encodeElement(this.gasPrice);
-        byte[] gasLimit = RLP.encodeElement(this.gasLimit);
+        byte[] gasCost = RLP.encodeElement(this.gasCost);
         byte[] receiveAddress = RLP.encodeElement(this.receiveAddress);
         byte[] value = RLP.encodeElement(this.value);
         byte[] data = RLP.encodeElement(this.data);
 
         // Since EIP-155 use chainId for v
         if (chainId == null) {
-            rlpRaw = RLP.encodeList(nonce, gasPrice, gasLimit, receiveAddress,
+            rlpRaw = RLP.encodeList(nonce, gasPrice, gasCost, receiveAddress,
                     value, data);
         } else {
             byte[] v, r, s;
             v = RLP.encodeInt(chainId);
             r = RLP.encodeElement(EMPTY_BYTE_ARRAY);
             s = RLP.encodeElement(EMPTY_BYTE_ARRAY);
-            rlpRaw = RLP.encodeList(nonce, gasPrice, gasLimit, receiveAddress,
+            rlpRaw = RLP.encodeList(nonce, gasPrice, gasCost, receiveAddress,
                     value, data, v, r, s);
         }
         return rlpRaw;
@@ -481,7 +480,7 @@ public class Transaction {
             nonce = RLP.encodeElement(this.nonce);
         }
         byte[] gasPrice = RLP.encodeElement(this.gasPrice);
-        byte[] gasLimit = RLP.encodeElement(this.gasLimit);
+        byte[] gasLimit = RLP.encodeElement(this.gasCost);
         byte[] receiveAddress = RLP.encodeElement(this.receiveAddress);
         byte[] value = RLP.encodeElement(this.value);
         byte[] data = RLP.encodeElement(this.data);

@@ -26,8 +26,12 @@ import org.ethereum.util.RLPList;
 
 import org.spongycastle.util.encoders.Hex;
 
+import java.io.Externalizable;
 import java.math.BigInteger;
+import java.util.Arrays;
 
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE.EXTERNAL;
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE.explain;
 import static org.ethereum.crypto.HashUtil.*;
 import static org.ethereum.util.FastByteComparisons.equal;
 
@@ -63,12 +67,57 @@ public class AccountState {
      * retrieval */
     private final byte[] codeHash;
 
+    private final ACCOUNT_TYPE accountType;
+
+    public static enum ACCOUNT_TYPE {
+        ASSET(Hex.decode("0000000000000000000000000000000000000000000000000000000000000001")),
+        ASSET_PROTO(Hex.decode("0000000000000000000000000000000000000000000000000000000000000002")),
+        EXTERNAL(Hex.decode("0000000000000000000000000000000000000000000000000000000000000003")),;
+
+        private byte[] rlpCode;
+
+        private ACCOUNT_TYPE(byte[] rlpCode) {
+            this.rlpCode = rlpCode;
+        }
+
+        public static boolean isAsset(ACCOUNT_TYPE input) {
+            return input == ASSET ? true : false;
+        }
+
+        public static boolean isAssetProto(ACCOUNT_TYPE input) {
+            return input == ASSET_PROTO ? true : false;
+        }
+
+        public static boolean isExternal(ACCOUNT_TYPE input) {
+            return input == EXTERNAL ? true : false;
+        }
+
+        public static ACCOUNT_TYPE explain(byte[] input) {
+            for (ACCOUNT_TYPE e : ACCOUNT_TYPE.values()) {
+                if (Arrays.equals(input, e.rlpCode))
+                    return e;
+            }
+            return null;
+        }
+
+        public static byte[] value(ACCOUNT_TYPE input) {
+            if (input == null)
+                return null;
+            else
+                return input.rlpCode;
+        }
+
+        public byte[] value() {
+            return this.rlpCode;
+        }
+    }
+
     public AccountState(SystemProperties config) {
         this(config.getBlockchainConfig().getCommonConstants().getInitialNonce(), BigInteger.ZERO);
     }
 
     public AccountState(BigInteger nonce, BigInteger balance) {
-        this(nonce, balance, EMPTY_TRIE_HASH, EMPTY_DATA_HASH);
+        this(nonce, balance, EMPTY_TRIE_HASH, EMPTY_DATA_HASH, EXTERNAL);
     }
 
     public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot, byte[] codeHash) {
@@ -76,6 +125,15 @@ public class AccountState {
         this.balance = balance;
         this.stateRoot = stateRoot == EMPTY_TRIE_HASH || equal(stateRoot, EMPTY_TRIE_HASH) ? EMPTY_TRIE_HASH : stateRoot;
         this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
+        this.accountType = ACCOUNT_TYPE.EXTERNAL;
+    }
+
+    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot, byte[] codeHash, ACCOUNT_TYPE accountType) {
+        this.nonce = nonce;
+        this.balance = balance;
+        this.stateRoot = stateRoot == EMPTY_TRIE_HASH || equal(stateRoot, EMPTY_TRIE_HASH) ? EMPTY_TRIE_HASH : stateRoot;
+        this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
+        this.accountType = accountType;
     }
 
     public AccountState(byte[] rlpData) {
@@ -88,6 +146,7 @@ public class AccountState {
                 : new BigInteger(1, items.get(1).getRLPData());
         this.stateRoot = items.get(2).getRLPData();
         this.codeHash = items.get(3).getRLPData();
+        this.accountType = items.get(4).getRLPData() == null ? EXTERNAL : explain(items.get(4).getRLPData());
     }
 
     public BigInteger getNonce() {
@@ -100,6 +159,10 @@ public class AccountState {
 
     public byte[] getStateRoot() {
         return stateRoot;
+    }
+
+    public ACCOUNT_TYPE getAccountType() {
+        return this.accountType;
     }
 
     public AccountState withStateRoot(byte[] stateRoot) {
