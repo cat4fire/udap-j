@@ -272,7 +272,15 @@
             <groupId>com.github.ipfs</groupId>
             <artifactId>java-ipfs-api</artifactId>
             <version>v1.2.0</version>
+            <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.7</version>
+            <scope>compile</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

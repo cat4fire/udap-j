@@ -1320,5 +1320,12 @@ public class Program {
         this.memory.write(0, data, data.length, false);
     }
 
+    public ProgramInvoke getInvoke() {
+        return invoke;
+    }
+
+    public void run() {
+        ApiEnum.determin(this).delegate(this);
+    }
 
 }

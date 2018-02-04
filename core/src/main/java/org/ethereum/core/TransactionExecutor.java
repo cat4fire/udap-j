@@ -84,8 +84,8 @@ public class TransactionExecutor {
 
     PrecompiledContracts.PrecompiledContract precompiledContract;
 
-    //BigInteger m_endGas = BigInteger.ZERO;
-    //long basicTxCost = 0;
+    BigInteger m_endGas = BigInteger.ZERO;
+    long basicTxCost = 0;
     List<LogInfo> logs = null;
 
     private ByteArraySet touchedAccounts = new ByteArraySet();
@@ -111,7 +111,7 @@ public class TransactionExecutor {
         this.currentBlock = currentBlock;
         this.listener = listener;
         this.gasUsedInTheBlock = gasUsedInTheBlock;
-        //    this.m_endGas = toBI(tx.getGasLimit());
+        this.m_endGas = toBI(tx.getGasLimit());
         withCommonConfig(CommonConfig.getDefault());
     }
 
@@ -133,29 +133,17 @@ public class TransactionExecutor {
      * set readyToExecute = true
      */
     public void init() {
-        //basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
-
-        //lycrus
-        byte[] lycrusAddress = null;
-
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
-
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            readyToExecute = true;
-            //here we ignore nonce check
-            return;
-        }
-        //lycrus
+        basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
 
         if (localCall) {
             readyToExecute = true;
             return;
         }
 
-        BigInteger txGasCost = new BigInteger(1, tx.getGasCost());
+        BigInteger txGasLimit = new BigInteger(1, tx.getGasLimit());
         BigInteger curBlockGasLimit = new BigInteger(1, currentBlock.getGasLimit());
 
-        boolean cumulativeGasReached = txGasCost.add(BigInteger.valueOf(gasUsedInTheBlock)).compareTo(curBlockGasLimit) > 0;
+        boolean cumulativeGasReached = txGasLimit.add(BigInteger.valueOf(gasUsedInTheBlock)).compareTo(curBlockGasLimit) > 0;
         if (cumulativeGasReached) {
 
             execError(String.format("Too much gas used in this block: Require: %s Got: %s", new BigInteger(1, currentBlock.getGasLimit()).longValue() - toBI(tx.getGasLimit()).longValue(), toBI(tx.getGasLimit()).longValue()));
@@ -163,23 +151,23 @@ public class TransactionExecutor {
             return;
         }
 
-        /*if (txGasLimit.compareTo(BigInteger.valueOf(basicTxCost)) < 0) {
+        if (txGasLimit.compareTo(BigInteger.valueOf(basicTxCost)) < 0) {
 
             execError(String.format("Not enough gas for transaction execution: Require: %s Got: %s", basicTxCost, txGasLimit));
 
             return;
-        }*/
+        }
 
-        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
+/*        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
         BigInteger txNonce = toBI(tx.getNonce());
         if (isNotEqual(reqNonce, txNonce)) {
             execError(String.format("Invalid nonce: required: %s , tx.nonce: %s", reqNonce, txNonce));
 
             return;
-        }
+        }*/
 
-        BigInteger txEthCost = toBI(tx.getGasPrice()).multiply(txGasCost);
-        BigInteger totalCost = toBI(tx.getValue()).add(txEthCost);
+        BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
+        BigInteger totalCost = toBI(tx.getValue()).add(txGasCost);
         BigInteger senderBalance = track.getBalance(tx.getSender());
         if (!isCovers(senderBalance, totalCost)) {
 
@@ -200,6 +188,7 @@ public class TransactionExecutor {
 
 
         //lycrus
+        if (!readyToExecute) return;
         byte[] lycrusAddress = null;
 
         lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
@@ -216,10 +205,8 @@ public class TransactionExecutor {
         }
         //lycrus
 
-        if (!readyToExecute) return;
-
         if (!localCall) {
-            track.increaseNonce(tx.getSender());
+            //        track.increaseNonce(tx.getSender());
 
             BigInteger txGasLimit = toBI(tx.getGasLimit());
             BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
@@ -240,7 +227,7 @@ public class TransactionExecutor {
         if (!readyToExecute) return;
 
         byte[] targetAddress = tx.getReceiveAddress();
-        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
+/*        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
 
         if (precompiledContract != null) {
             long requiredGas = precompiledContract.getGasForData(tx.getData());
@@ -268,20 +255,20 @@ public class TransactionExecutor {
                 }
             }
 
-        } else {
+        } else {*/
 
-            byte[] code = track.getCode(targetAddress);
+            /*byte[] code = track.getCode(targetAddress);
             if (isEmpty(code)) {
                 m_endGas = m_endGas.subtract(BigInteger.valueOf(basicTxCost));
                 result.spendGas(basicTxCost);
-            } else {
+            } else {*/
                 ProgramInvoke programInvoke =
                         programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 
-                this.vm = new VM(config);
-                this.program = new Program(track.getCodeHash(targetAddress), code, programInvoke, tx, config).withCommonConfig(commonConfig);
-            }
-        }
+        //this.vm = new VM(config);
+        this.program = new Program(track.getCodeHash(targetAddress), null/*code*/, programInvoke, tx, config).withCommonConfig(commonConfig);
+            /*}*/
+        /*}*/
 
         BigInteger endowment = toBI(tx.getValue());
         transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
@@ -335,7 +322,7 @@ public class TransactionExecutor {
         if (!readyToExecute) return;
 
         //lycrus
-        byte[] lycrusAddress = null;
+/*        byte[] lycrusAddress = null;
 
         lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
         if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
@@ -362,10 +349,40 @@ public class TransactionExecutor {
             touchedAccounts.add(lycrusAddress);
             cacheTrack.commit();
             return;
+        }*/
+
+        if (program == null) return;
+        try {
+            program.run();
+            result = program.getResult();
+            m_endGas = toBI(tx.getGasLimit()).subtract(toBI(program.getResult().getGasUsed()));
+
+            if (result.getException() != null || result.isRevert()) {
+                result.getDeleteAccounts().clear();
+                result.getLogInfoList().clear();
+                result.resetFutureRefund();
+                rollback();
+
+                if (result.getException() != null) {
+                    throw result.getException();
+                } else {
+                    execError("REVERT opcode executed");
+                }
+            } else {
+                touchedAccounts.addAll(result.getTouchedAccounts());
+                cacheTrack.commit();
+            }
+        } catch (Throwable e) {
+
+            // TODO: catch whatever they will throw on you !!!
+//            https://github.com/ethereum/cpp-ethereum/blob/develop/libethereum/Executive.cpp#L241
+            rollback();
+            m_endGas = BigInteger.ZERO;
+            execError(e.getMessage());
         }
-
-
+        return;
         //lycrus
+/*
 
         try {
 
@@ -438,7 +455,8 @@ public class TransactionExecutor {
             rollback();
             m_endGas = BigInteger.ZERO;
             execError(e.getMessage());
-        }
+        }*/
+
     }
 
     private void rollback() {

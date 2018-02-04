@@ -191,6 +191,7 @@ public enum OpCode {
      */
     CODECOPY(0x39, 3, 0, VeryLowTier), // [len code_start mem_start CODECOPY]
 
+    //https://github.com/ethereum/EIPs/blob/master/EIPS/eip-211.md
     RETURNDATASIZE(0x3d, 0, 1, BaseTier),
 
     RETURNDATACOPY(0x3e, 3, 0, VeryLowTier),
