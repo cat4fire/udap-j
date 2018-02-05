@@ -19,7 +19,6 @@ package org.ethereum.core;
 
 import org.ethereum.util.*;
 import org.ethereum.vm.LogInfo;
-import org.ethereum.vm.ReturnData;
 import org.spongycastle.util.BigIntegers;
 import org.spongycastle.util.encoders.Hex;
 
@@ -45,8 +44,6 @@ public class TransactionReceipt {
     private byte[] cumulativeGas = EMPTY_BYTE_ARRAY;
     private Bloom bloomFilter = new Bloom();
     private List<LogInfo> logInfoList = new ArrayList<>();
-
-    private ReturnData returnData = null;
 
     private byte[] gasUsed = EMPTY_BYTE_ARRAY;
     private byte[] executionResult = EMPTY_BYTE_ARRAY;
