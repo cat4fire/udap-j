@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
  * @author Roman Mandeleil
  * @since 01.06.2014
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+/*@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class VMCustomTest {
 
     private ProgramInvokeMockImpl invoke;
@@ -546,9 +546,9 @@ public class VMCustomTest {
         }
     }
 
-    /* TEST CASE LIST END */
+    *//* TEST CASE LIST END *//*
 
-}
+}*/
 
 // TODO: add gas expeted and calculated to all test cases
 // TODO: considering: G_TXDATA + G_TRANSACTION

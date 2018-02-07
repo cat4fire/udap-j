@@ -353,13 +353,14 @@ public class ContractsService {
     }
 
     private String getAsm(String code) {
-        if (isBlank(code)) return StringUtils.EMPTY;
+        /*if (isBlank(code)) return StringUtils.EMPTY;
 
         try {
             return Program.stringify(Hex.decode(code));
         } catch (Program.IllegalOperationException e) {
             return e.getMessage();
-        }
+        }*/
+        return "";
     }
 
     /**

@@ -79,7 +79,7 @@ public class TransactionExecutor {
 
     private final EthereumListener listener;
 
-    private VM vm;
+    //private VM vm;
     private Program program;
 
     PrecompiledContracts.PrecompiledContract precompiledContract;
@@ -198,9 +198,9 @@ public class TransactionExecutor {
             ProgramInvoke programInvoke =
                     programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 //cacheTrack -> track
-            this.vm = new VM(config);
+            //this.vm = new VM(config);
             byte[] code = track.getCode(targetAddress);
-            this.program = new Program(track.getCodeHash(targetAddress), code, programInvoke, tx, config).withCommonConfig(commonConfig);
+            this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
             return;
         }
         //lycrus
@@ -216,11 +216,12 @@ public class TransactionExecutor {
                 logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
         }
 
-        if (tx.isContractCreation()) {
+
+        /*if (tx.isContractCreation()) {
             create();
-        } else {
+        } else {*/
             call();
-        }
+        /*}*/
     }
 
     private void call() {
@@ -266,7 +267,7 @@ public class TransactionExecutor {
                         programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 
         //this.vm = new VM(config);
-        this.program = new Program(track.getCodeHash(targetAddress), null/*code*/, programInvoke, tx, config).withCommonConfig(commonConfig);
+        this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
             /*}*/
         /*}*/
 
@@ -276,7 +277,7 @@ public class TransactionExecutor {
         touchedAccounts.add(targetAddress);
     }
 
-    private void create() {
+    /*private void create() {
         byte[] newContractAddress = tx.getContractAddress();
 
         AccountState existingAddr = cacheTrack.getAccountState(newContractAddress);
@@ -316,7 +317,7 @@ public class TransactionExecutor {
         transfer(cacheTrack, tx.getSender(), newContractAddress, endowment);
 
         touchedAccounts.add(newContractAddress);
-    }
+    }*/
 
     public void go() {
         if (!readyToExecute) return;
@@ -501,7 +502,7 @@ public class TransactionExecutor {
                     .gasUsed(toBI(result.getGasUsed()))
                     .gasRefund(toBI(gasRefund))
                     .deletedAccounts(result.getDeleteAccounts())
-                    .internalTransactions(result.getInternalTransactions());
+                    /*.internalTransactions(result.getInternalTransactions())*/;
 
             ContractDetails contractDetails = track.getContractDetails(addr);
             if (contractDetails != null) {
@@ -549,7 +550,7 @@ public class TransactionExecutor {
 
         listener.onTransactionExecuted(summary);
 
-        if (config.vmTrace() && program != null && result != null) {
+        /*if (config.vmTrace() && program != null && result != null) {
             String trace = program.getTrace()
                     .result(result.getHReturn())
                     .error(result.getException())
@@ -563,7 +564,7 @@ public class TransactionExecutor {
             String txHash = toHexString(tx.getHash());
             saveProgramTraceFile(config, txHash, trace);
             listener.onVMTraceCreated(txHash, trace);
-        }
+        }*/
         return summary;
     }
 
@@ -583,7 +584,8 @@ public class TransactionExecutor {
             receipt.setGasUsed(getGasUsed());
             receipt.setExecutionResult(getResult().getHReturn());
             receipt.setError(execError);
-//            receipt.setPostTxState(track.getRoot()); // TODO later when RepositoryTrack.getRoot() is implemented
+            receipt.setTxStatus(receipt.isSuccessful());
+//            receipt.setTxState(track.getRoot()); // TODO later when RepositoryTrack.getRoot() is implemented
         }
         return receipt;
     }

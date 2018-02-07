@@ -361,8 +361,9 @@ public class Transaction {
 
     @Deprecated
     public boolean isContractCreation() {
-        rlpParse();
-        return this.receiveAddress == null || Arrays.equals(this.receiveAddress, ByteUtil.EMPTY_BYTE_ARRAY);
+        return false;
+        /*rlpParse();
+        return this.receiveAddress == null || Arrays.equals(this.receiveAddress, ByteUtil.EMPTY_BYTE_ARRAY);*/
     }
 
     /*

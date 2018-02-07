@@ -44,6 +44,8 @@ public class TransactionReceiptDTO {
     //    public String from;
 //    public String to;
     public JsonRpc.LogFilterElement[] logs;         // Array of log objects, which this transaction generated.
+    public String output;
+    public String status;
 
     public TransactionReceiptDTO(Block block, TransactionInfo txInfo) {
         TransactionReceipt receipt = txInfo.getReceipt();
@@ -70,5 +72,7 @@ public class TransactionReceiptDTO {
             logs[i] = new JsonRpc.LogFilterElement(logInfo, block, txInfo.getIndex(),
                     txInfo.getReceipt().getTransaction(), i);
         }
+        output = toJsonHex(txInfo.getReceipt().getExecutionResult());
+        status = toJsonHex(txInfo.getReceipt().getTxState());
     }
 }

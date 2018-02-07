@@ -18,8 +18,6 @@
 package org.ethereum.db;
 
 import org.ethereum.config.SystemProperties;
-import org.ethereum.config.blockchain.FrontierConfig;
-import org.ethereum.config.net.MainNetConfig;
 import org.ethereum.core.Block;
 import org.ethereum.core.Transaction;
 import org.ethereum.core.TransactionInfo;
@@ -29,7 +27,6 @@ import org.ethereum.util.blockchain.StandaloneBlockchain;
 import org.ethereum.vm.DataWord;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigInteger;
@@ -134,6 +131,6 @@ public class TransactionStoreTest {
         txDb1.put(tx.getHash(), info.getEncoded()); // legacy serialization
         TransactionStore transactionStore1 = new TransactionStore(txDb1);
         TransactionInfo info1 = transactionStore1.get(tx.getHash()).get(0);
-        Assert.assertArrayEquals(info1.getReceipt().getPostTxState(), info.getReceipt().getPostTxState());
+        Assert.assertArrayEquals(info1.getReceipt().getTxState(), info.getReceipt().getTxState());
     }
 }

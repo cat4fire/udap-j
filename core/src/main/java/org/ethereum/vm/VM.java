@@ -73,7 +73,7 @@ import static org.ethereum.vm.OpCode.*;
  * @author Roman Mandeleil
  * @since 01.06.2014
  */
-public class VM {
+/*public class VM {
 
     private static final Logger logger = LoggerFactory.getLogger("VM");
     private static final Logger dumpLogger = LoggerFactory.getLogger("dump");
@@ -85,7 +85,7 @@ public class VM {
     private static BigInteger MAX_MEM_SIZE = BigInteger.valueOf(Integer.MAX_VALUE);
 
 
-    /* Keeps track of the number of steps performed in this VM */
+    *//* Keeps track of the number of steps performed in this VM *//*
     private int vmCounter = 0;
 
     private static VMHook vmHook;
@@ -189,7 +189,7 @@ public class VM {
             GasCost gasCosts = blockchainConfig.getGasCost();
             DataWord adjustedCallGas = null;
 
-            /*DEBUG #POC9 if( op.asInt() == 96 || op.asInt() == -128 || op.asInt() == 57 || op.asInt() == 115) {
+            *//*DEBUG #POC9 if( op.asInt() == 96 || op.asInt() == -128 || op.asInt() == 57 || op.asInt() == 115) {
               //byte alphaone = 0x63;
               //op = OpCode.code(alphaone);
               gasCost = 3;
@@ -199,7 +199,7 @@ public class VM {
               //byte alphaone = 0x63;
               //op = OpCode.code(alphaone);
               gasCost = 0;
-            }*/
+            }*//*
 
             // Calculate fees and spend gas
             switch (op) {
@@ -371,9 +371,9 @@ public class VM {
 
             // Execute operation
             switch (op) {
-                /**
+                *//**
                  * Stop and Arithmetic Operations
-                 */
+ *//*
                 case STOP: {
                     program.setHReturn(EMPTY_BYTE_ARRAY);
                     program.stop();
@@ -606,9 +606,9 @@ public class VM {
                 }
                 break;
 
-                /**
+                *//**
                  * Bitwise Logic Operations
-                 */
+ *//*
                 case AND: {
                     DataWord word1 = program.stackPop();
                     DataWord word2 = program.stackPop();
@@ -684,9 +684,9 @@ public class VM {
                 }
                 break;
 
-                /**
+                *//**
                  * SHA3
-                 */
+ *//*
                 case SHA3: {
                     DataWord memOffsetData = program.stackPop();
                     DataWord lengthData = program.stackPop();
@@ -703,9 +703,9 @@ public class VM {
                 }
                 break;
 
-                /**
+                *//**
                  * Environmental Information
-                 */
+ *//*
                 case ADDRESS: {
                     DataWord address = program.getOwnerAddress();
 
@@ -885,9 +885,9 @@ public class VM {
                 }
                 break;
 
-                /**
+                *//**
                  * Block Information
-                 */
+ *//*
                 case BLOCKHASH: {
 
                     int blockIndex = program.stackPop().intValueSafe();
@@ -1358,26 +1358,26 @@ public class VM {
         VM.vmHook = vmHook;
     }
 
-    /**
+    *//**
      * Utility to calculate new total memory size needed for an operation.
      * <br/> Basically just offset + size, unless size is 0, in which case the result is also 0.
      *
      * @param offset starting position of the memory
      * @param size   number of bytes needed
      * @return offset + size, unless size is 0. In that case memNeeded is also 0.
-     */
+ *//*
     private static BigInteger memNeeded(DataWord offset, DataWord size) {
         return size.isZero() ? BigInteger.ZERO : offset.value().add(size.value());
     }
 
-    /*
+    *//*
      * Dumping the VM state at the current operation in various styles
      *  - standard  Not Yet Implemented
      *  - standard+ (owner address, program counter, operation, gas left)
      *  - pretty (stack, memory, storage, level, contract,
      *              vmCounter, internalSteps, operation
                     gasBefore, gasCost, memWords)
-     */
+     *//*
     private void dumpLine(OpCode op, long gasBefore, long gasCost, long memWords, Program program) {
         if (config.dumpStyle().equals("standard+")) {
             switch (op) {
@@ -1434,4 +1434,4 @@ public class VM {
                     gasBefore, gasCost, memWords);
         }
     }
-}
+}*/

@@ -27,7 +27,7 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import com.ethercamp.harmony.keystore.FileSystemKeystore;
 import org.ethereum.util.BuildInfo;
-import org.ethereum.vm.VM;
+//import org.ethereum.vm.VM;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import com.ethercamp.harmony.model.dto.*;
@@ -214,7 +214,7 @@ public class BlockchainInfoService implements ApplicationListener {
 
             final boolean isContractsFeatureEnabled = env.getProperty("feature.contract.enabled", "false").equalsIgnoreCase("true");
             if (!isContractsFeatureEnabled) {
-                VM.setVmHook(null);
+                //VM.setVmHook(null);
                 log.info("Disabled VM hook due to contracts feature disabled");
             }
 

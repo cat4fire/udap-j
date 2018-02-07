@@ -17,7 +17,6 @@
  */
 package org.ethereum.core;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.ethereum.config.BlockchainConfig;
 import org.ethereum.config.CommonConfig;
 import org.ethereum.config.SystemProperties;
@@ -55,9 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.concurrent.*;
 
-import static java.lang.Math.PI;
 import static java.lang.Math.max;
 import static java.lang.Runtime.getRuntime;
 import static java.math.BigInteger.ONE;
@@ -66,7 +63,6 @@ import static java.util.Collections.emptyList;
 import static org.ethereum.core.Denomination.SZABO;
 import static org.ethereum.core.ImportResult.*;
 import static org.ethereum.crypto.HashUtil.sha3;
-import static org.ethereum.util.BIUtil.isMoreThan;
 
 /**
  * The Ethereum blockchain is in many ways similar to the Bitcoin blockchain,
@@ -883,11 +879,11 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             txTrack.commit();
             final TransactionReceipt receipt = executor.getReceipt();
 
-            if (blockchainConfig.eip658()) {
+            /*if (blockchainConfig.eip658()) {
                 receipt.setTxStatus(receipt.isSuccessful());
             } else {
-                receipt.setPostTxState(track.getRoot());
-            }
+                receipt.setTxState(track.getRoot());
+            }*/
 
             stateLogger.info("block: [{}] executed tx: [{}] \n  state: [{}]", block.getNumber(), i,
                     Hex.toHexString(track.getRoot()));

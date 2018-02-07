@@ -1,6 +1,7 @@
 package org.ethereum.vm;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.ethereum.core.CallTransaction;
 import org.ethereum.vm.program.Program;
 import org.spongycastle.util.encoders.Hex;
 
@@ -9,16 +10,18 @@ import java.util.Comparator;
 
 public enum ApiEnum {
 
-    FOO("foo", Hex.decode("12345671")),
-    BAR("bar", Hex.decode("12345672")),
-    HELLOWORLD("bar", Hex.decode("12345673")),;
+    FOO("foo", CallTransaction.Function.fromSignature("foo", new String[]{"uint256", "uint256"}, new String[]{"uint256"})),
+    BAR("bar", CallTransaction.Function.fromSignature("bar", new String[]{"uint256", "uint256"}, new String[]{"uint256"})),
+    HELLOWORLD("helloworld", CallTransaction.Function.fromSignature("helloworld", new String[]{"uint256", "uint256"}, new String[]{"uint256"})),;
 
     private String name;
-    private byte[] code;
+    private CallTransaction.Function function;
+    private byte[] functionHash;
 
-    ApiEnum(String name, byte[] code) {
+    ApiEnum(String name, CallTransaction.Function function) {
         this.name = name;
-        this.code = code;
+        this.function = function;
+        this.functionHash = function.encodeSignature();
     }
 
     public static ApiEnum determin(Program program) {
@@ -30,7 +33,7 @@ public enum ApiEnum {
         }
         if (ArrayUtils.isNotEmpty(functionHash)) {
             for (ApiEnum e : ApiEnum.values()) {
-                if (Arrays.equals(functionHash, e.code)) {
+                if (Arrays.equals(functionHash, e.functionHash)) {
                     return e;
                 }
             }
@@ -39,13 +42,13 @@ public enum ApiEnum {
     }
 
     public void delegate(Program program) {
-        if (Arrays.equals(FOO.code, this.code)) {
+        if (Arrays.equals(FOO.functionHash, this.functionHash)) {
             Api.foo(program);
         }
-        if (Arrays.equals(BAR.code, this.code)) {
+        if (Arrays.equals(BAR.functionHash, this.functionHash)) {
             Api.bar(program);
         }
-        if (Arrays.equals(HELLOWORLD.code, this.code)) {
+        if (Arrays.equals(HELLOWORLD.functionHash, this.functionHash)) {
             Api.helloworld(program);
         }
     }

@@ -17,17 +17,12 @@
  */
 package org.ethereum.core;
 
-import org.ethereum.crypto.ECKey;
-import org.ethereum.vm.DataWord;
-import org.ethereum.vm.LogInfo;
 import org.junit.Test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.spongycastle.util.encoders.Hex;
-
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 
@@ -50,7 +45,7 @@ public class TransactionReceiptTest {
         assertEquals(1, txReceipt.getLogInfoList().size());
 
         assertEquals("966265cc49fa1f10f0445f035258d116563931022a3570a640af5d73a214a8da",
-                Hex.toHexString(txReceipt.getPostTxState()));
+                Hex.toHexString(txReceipt.getTxState()));
 
         assertEquals("2b6f",
                 Hex.toHexString(txReceipt.getCumulativeGas()));
