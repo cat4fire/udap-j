@@ -90,9 +90,9 @@ public class Genesis extends Block {
             repository.createAccount(key.getData());
             repository.setNonce(key.getData(), accountState.getNonce());
             repository.addBalance(key.getData(), accountState.getBalance());
-            if (premineAccount.code != null) {
+            /*if (premineAccount.code != null) {
                 repository.saveCode(key.getData(), premineAccount.code);
-            }
+            }*/
         }
     }
 

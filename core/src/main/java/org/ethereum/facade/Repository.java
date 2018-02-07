@@ -59,7 +59,7 @@ public interface Repository {
      * @param addr of the account
      * @return code in byte-array format
      */
-    byte[] getCode(byte[] addr);
+    /*byte[] getCode(byte[] addr);*/
 
 
     /**

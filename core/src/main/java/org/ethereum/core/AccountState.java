@@ -30,8 +30,6 @@ import java.io.Externalizable;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-import static org.ethereum.core.AccountState.ACCOUNT_TYPE.EXTERNAL;
-import static org.ethereum.core.AccountState.ACCOUNT_TYPE.explain;
 import static org.ethereum.crypto.HashUtil.*;
 import static org.ethereum.util.FastByteComparisons.equal;
 
@@ -65,74 +63,41 @@ public class AccountState {
      * after construction. All such code fragments are contained in
      * the state database under their corresponding hashes for later
      * retrieval */
-    private final byte[] codeHash;
+    /*private final byte[] codeHash;*/
 
-    private final ACCOUNT_TYPE accountType;
 
-    public static enum ACCOUNT_TYPE {
-        ASSET(Hex.decode("0000000000000000000000000000000000000000000000000000000000000001")),
-        ASSET_PROTO(Hex.decode("0000000000000000000000000000000000000000000000000000000000000002")),
-        EXTERNAL(Hex.decode("0000000000000000000000000000000000000000000000000000000000000003")),;
+    /**
+     * External = 1
+     * AssetProto = 2
+     * Asset = 3
+     */
+    private final BigInteger accountType;
 
-        private byte[] rlpCode;
-
-        private ACCOUNT_TYPE(byte[] rlpCode) {
-            this.rlpCode = rlpCode;
-        }
-
-        public static boolean isAsset(ACCOUNT_TYPE input) {
-            return input == ASSET ? true : false;
-        }
-
-        public static boolean isAssetProto(ACCOUNT_TYPE input) {
-            return input == ASSET_PROTO ? true : false;
-        }
-
-        public static boolean isExternal(ACCOUNT_TYPE input) {
-            return input == EXTERNAL ? true : false;
-        }
-
-        public static ACCOUNT_TYPE explain(byte[] input) {
-            for (ACCOUNT_TYPE e : ACCOUNT_TYPE.values()) {
-                if (Arrays.equals(input, e.rlpCode))
-                    return e;
-            }
-            return null;
-        }
-
-        public static byte[] value(ACCOUNT_TYPE input) {
-            if (input == null)
-                return null;
-            else
-                return input.rlpCode;
-        }
-
-        public byte[] value() {
-            return this.rlpCode;
-        }
-    }
+    private static BigInteger ACCOUNT_TYPE_EXTERNAL = BigInteger.valueOf(1);
+    private static BigInteger ACCOUNT_TYPE_ASSET_PROTO = BigInteger.valueOf(2);
+    private static BigInteger ACCOUNT_TYPE_ASSET = BigInteger.valueOf(3);
 
     public AccountState(SystemProperties config) {
         this(config.getBlockchainConfig().getCommonConstants().getInitialNonce(), BigInteger.ZERO);
     }
 
     public AccountState(BigInteger nonce, BigInteger balance) {
-        this(nonce, balance, EMPTY_TRIE_HASH, EMPTY_DATA_HASH, EXTERNAL);
+        this(nonce, balance, EMPTY_TRIE_HASH/*, EMPTY_DATA_HASH*/, ACCOUNT_TYPE_EXTERNAL);
     }
 
-    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot, byte[] codeHash) {
+    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot/*, byte[] codeHash*/) {
         this.nonce = nonce;
         this.balance = balance;
         this.stateRoot = stateRoot == EMPTY_TRIE_HASH || equal(stateRoot, EMPTY_TRIE_HASH) ? EMPTY_TRIE_HASH : stateRoot;
-        this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
-        this.accountType = ACCOUNT_TYPE.EXTERNAL;
+        //this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
+        this.accountType = ACCOUNT_TYPE_EXTERNAL;
     }
 
-    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot, byte[] codeHash, ACCOUNT_TYPE accountType) {
+    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot/*, byte[] codeHash*/, BigInteger accountType) {
         this.nonce = nonce;
         this.balance = balance;
         this.stateRoot = stateRoot == EMPTY_TRIE_HASH || equal(stateRoot, EMPTY_TRIE_HASH) ? EMPTY_TRIE_HASH : stateRoot;
-        this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
+        //this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
         this.accountType = accountType;
     }
 
@@ -145,40 +110,50 @@ public class AccountState {
         this.balance = items.get(1).getRLPData() == null ? BigInteger.ZERO
                 : new BigInteger(1, items.get(1).getRLPData());
         this.stateRoot = items.get(2).getRLPData();
-        this.codeHash = items.get(3).getRLPData();
-        this.accountType = items.get(4).getRLPData() == null ? EXTERNAL : explain(items.get(4).getRLPData());
+        //this.codeHash = items.get(3).getRLPData();
+        this.accountType = items.get(3).getRLPData() == null ? ACCOUNT_TYPE_EXTERNAL : new BigInteger(1, items.get(3).getRLPData());
     }
+
+
+    public byte[] getEncoded() {
+        if (rlpEncoded == null) {
+            byte[] nonce = RLP.encodeBigInteger(this.nonce);
+            byte[] balance = RLP.encodeBigInteger(this.balance);
+            byte[] stateRoot = RLP.encodeElement(this.stateRoot);
+            //byte[] codeHash = RLP.encodeElement(this.codeHash);
+            byte[] accountType = RLP.encodeBigInteger(this.accountType);
+            this.rlpEncoded = RLP.encodeList(nonce, balance, stateRoot/*, codeHash*/, accountType);
+        }
+        return rlpEncoded;
+    }
+
 
     public BigInteger getNonce() {
         return nonce;
     }
 
     public AccountState withNonce(BigInteger nonce) {
-        return new AccountState(nonce, balance, stateRoot, codeHash);
+        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
     }
 
     public byte[] getStateRoot() {
         return stateRoot;
     }
 
-    public ACCOUNT_TYPE getAccountType() {
-        return this.accountType;
-    }
-
     public AccountState withStateRoot(byte[] stateRoot) {
-        return new AccountState(nonce, balance, stateRoot, codeHash);
+        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
     }
 
     public AccountState withIncrementedNonce() {
-        return new AccountState(nonce.add(BigInteger.ONE), balance, stateRoot, codeHash);
+        return new AccountState(nonce.add(BigInteger.ONE), balance, stateRoot/*, codeHash*/);
     }
 
-    public byte[] getCodeHash() {
+    /*public byte[] getCodeHash() {
         return codeHash;
-    }
+    }*/
 
     public AccountState withCodeHash(byte[] codeHash) {
-        return new AccountState(nonce, balance, stateRoot, codeHash);
+        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
     }
 
     public BigInteger getBalance() {
@@ -186,37 +161,30 @@ public class AccountState {
     }
 
     public AccountState withBalanceIncrement(BigInteger value) {
-        return new AccountState(nonce, balance.add(value), stateRoot, codeHash);
-    }
-
-    public byte[] getEncoded() {
-        if (rlpEncoded == null) {
-            byte[] nonce = RLP.encodeBigInteger(this.nonce);
-            byte[] balance = RLP.encodeBigInteger(this.balance);
-            byte[] stateRoot = RLP.encodeElement(this.stateRoot);
-            byte[] codeHash = RLP.encodeElement(this.codeHash);
-            this.rlpEncoded = RLP.encodeList(nonce, balance, stateRoot, codeHash);
-        }
-        return rlpEncoded;
+        return new AccountState(nonce, balance.add(value), stateRoot/*, codeHash*/);
     }
 
     public boolean isContractExist(BlockchainConfig blockchainConfig) {
-        return !FastByteComparisons.equal(codeHash, EMPTY_DATA_HASH) ||
+        return /*!FastByteComparisons.equal(codeHash, EMPTY_DATA_HASH) ||*/
                 !blockchainConfig.getConstants().getInitialNonce().equals(nonce);
     }
 
     public boolean isEmpty() {
-        return FastByteComparisons.equal(codeHash, EMPTY_DATA_HASH) &&
+        return /*FastByteComparisons.equal(codeHash, EMPTY_DATA_HASH) &&*/
                 BigInteger.ZERO.equals(balance) &&
                 BigInteger.ZERO.equals(nonce);
+    }
+
+    public BigInteger getAccountType() {
+        return accountType;
     }
 
 
     public String toString() {
         String ret = "  Nonce: " + this.getNonce().toString() + "\n" +
                 "  Balance: " + getBalance() + "\n" +
-                "  State Root: " + Hex.toHexString(this.getStateRoot()) + "\n" +
-                "  Code Hash: " + Hex.toHexString(this.getCodeHash());
+                "  State Root: " + Hex.toHexString(this.getStateRoot()) + "\n" /*+
+                "  Code Hash: " + Hex.toHexString(this.getCodeHash())*/;
         return ret;
     }
 }

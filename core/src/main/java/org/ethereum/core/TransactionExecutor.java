@@ -199,7 +199,7 @@ public class TransactionExecutor {
                     programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 //cacheTrack -> track
             //this.vm = new VM(config);
-            byte[] code = track.getCode(targetAddress);
+            //byte[] code = track.getCode(targetAddress);
             this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
             return;
         }

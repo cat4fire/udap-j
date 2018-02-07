@@ -488,11 +488,11 @@ public class EthJsonRpcImpl implements JsonRpc {
         return TypeConverter.toJsonHex(n);
     }
 
-    public String eth_getCode(String address, String blockId) throws Exception {
+    /*public String eth_getCode(String address, String blockId) throws Exception {
         byte[] addressAsByteArray = TypeConverter.StringHexToByteArray(address);
         byte[] code = getRepoByJsonBlockId(blockId).getCode(addressAsByteArray);
         return TypeConverter.toJsonHex(code);
-    }
+    }*/
 
     /**
      * Sign message hash with key to produce Elliptic Curve Digital Signature (ECDSA) signature.

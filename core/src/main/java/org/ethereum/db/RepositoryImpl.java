@@ -124,26 +124,27 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         return getContractDetails(addr) != null;
     }
 
+    /*@Deprecated
     @Override
     public synchronized void saveCode(byte[] addr, byte[] code) {
         byte[] codeHash = HashUtil.sha3(code);
         codeCache.put(codeHash, code);
         AccountState accountState = getOrCreateAccountState(addr);
         accountStateCache.put(addr, accountState.withCodeHash(codeHash));
-    }
+    }*/
 
-    @Override
+    /*@Override
     public synchronized byte[] getCode(byte[] addr) {
         byte[] codeHash = getCodeHash(addr);
         return FastByteComparisons.equal(codeHash, HashUtil.EMPTY_DATA_HASH) ?
                 ByteUtil.EMPTY_BYTE_ARRAY : codeCache.get(codeHash);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public byte[] getCodeHash(byte[] addr) {
         AccountState accountState = getAccountState(addr);
         return accountState != null ? accountState.getCodeHash() : HashUtil.EMPTY_DATA_HASH;
-    }
+    }*/
 
     @Override
     public synchronized void addStorageRow(byte[] addr, DataWord key, DataWord value) {
@@ -242,9 +243,10 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
             return RepositoryImpl.this.getStorageValue(address, key);
         }
 
-        @Override
+        /*@Override
         public byte[] getCode() {
-            return RepositoryImpl.this.getCode(address);
+            //return RepositoryImpl.this.getCode(address);
+            return null;
         }
 
         @Override
@@ -252,10 +254,12 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
             throw new RuntimeException("Not supported");
         }
 
+        @Deprecated
         @Override
         public void setCode(byte[] code) {
-            RepositoryImpl.this.saveCode(address, code);
-        }
+            //RepositoryImpl.this.saveCode(address, code);
+            return;
+        }*/
 
         @Override
         public byte[] getStorageHash() {
@@ -414,10 +418,11 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
             for (DataWord key : entry.getValue().getStorageKeys()) {
                 details.put(key, entry.getValue().get(key));
             }
-            byte[] code = entry.getValue().getCode();
+            //todo lycrus codeStorage part will be removed
+            /*byte[] code = entry.getValue().getCode();
             if (code != null && code.length > 0) {
                 details.setCode(code);
-            }
+            }*/
         }
     }
 

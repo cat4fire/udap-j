@@ -256,7 +256,7 @@ public interface JsonRpc {
 
     String eth_getUncleCountByBlockNumber(String bnOrId) throws Exception;
 
-    String eth_getCode(String addr, String bnOrId) throws Exception;
+    /*String eth_getCode(String addr, String bnOrId) throws Exception;*/
 
     String eth_sign(String addr, String data) throws Exception;
 

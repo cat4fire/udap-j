@@ -248,9 +248,9 @@ public class FastSyncManager {
                     byte[] nodeValue = (byte[]) node.get(1);
                     AccountState state = new AccountState(nodeValue);
 
-                    if (!FastByteComparisons.equal(HashUtil.EMPTY_DATA_HASH, state.getCodeHash())) {
+                    /*if (!FastByteComparisons.equal(HashUtil.EMPTY_DATA_HASH, state.getCodeHash())) {
                         ret.add(new TrieNodeRequest(TrieNodeType.CODE, state.getCodeHash()));
-                    }
+                    }*/
                     if (!FastByteComparisons.equal(HashUtil.EMPTY_TRIE_HASH, state.getStateRoot())) {
                         ret.add(new TrieNodeRequest(TrieNodeType.STORAGE, state.getStateRoot()));
                     }

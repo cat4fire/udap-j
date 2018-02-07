@@ -31,11 +31,11 @@ public interface ContractDetails {
 
     DataWord get(DataWord key);
 
-    byte[] getCode();
+    /*byte[] getCode();
 
     byte[] getCode(byte[] codeHash);
 
-    void setCode(byte[] code);
+    void setCode(byte[] code);*/
 
     byte[] getStorageHash();
 

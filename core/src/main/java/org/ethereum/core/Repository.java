@@ -104,7 +104,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr for the account
      * @param code that will be associated with this account
      */
-    void saveCode(byte[] addr, byte[] code);
+    /*void saveCode(byte[] addr, byte[] code);*/
 
     /**
      * Retrieve the code associated with an account
@@ -112,7 +112,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr of the account
      * @return code in byte-array format
      */
-    byte[] getCode(byte[] addr);
+    /*byte[] getCode(byte[] addr);*/
 
     /**
      * Retrieve the code hash associated with an account
@@ -120,7 +120,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr of the account
      * @return code hash
      */
-    byte[] getCodeHash(byte[] addr);
+    /*byte[] getCodeHash(byte[] addr);*/
 
     /**
      * Put a value in storage of an account at a given key

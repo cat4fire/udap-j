@@ -83,7 +83,8 @@ public class JSONHelper {
 
         account.put("balance", state.getBalance() == null ? "0" : state.getBalance().toString());
 //        account.put("codeHash", details.getCodeHash() == null ? "0x" : "0x" + Hex.toHexString(details.getCodeHash()));
-        account.put("code", details.getCode() == null ? "0x" : "0x" + Hex.toHexString(details.getCode()));
+//        account.put("code", details.getCode() == null ? "0x" : "0x" + Hex.toHexString(details.getCode()));
+        account.put("type", state.getAccountType() == null ? "unknow" : state.getAccountType().toString());
         account.put("nonce", state.getNonce() == null ? "0" : state.getNonce().toString());
         account.set("storage", storage);
         account.put("storage_root", state.getStateRoot() == null ? "" : Hex.toHexString(state.getStateRoot()));

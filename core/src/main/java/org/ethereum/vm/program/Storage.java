@@ -96,7 +96,7 @@ public class Storage implements Repository, ProgramListenerAware {
         return repository.hasContractDetails(addr);
     }
 
-    @Override
+    /*@Override
     public void saveCode(byte[] addr, byte[] code) {
         repository.saveCode(addr, code);
     }
@@ -109,7 +109,7 @@ public class Storage implements Repository, ProgramListenerAware {
     @Override
     public byte[] getCodeHash(byte[] addr) {
         return repository.getCodeHash(addr);
-    }
+    }*/
 
     @Override
     public void addStorageRow(byte[] addr, DataWord key, DataWord value) {

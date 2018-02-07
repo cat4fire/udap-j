@@ -55,12 +55,12 @@ public class ProgramInvokeMockImpl implements ProgramInvoke {
         this.repository.createAccount(ownerAddress);
 
         this.repository.createAccount(contractAddress);
-        this.repository.saveCode(contractAddress,
+        /*this.repository.saveCode(contractAddress,
                 Hex.decode("385E60076000396000605f556014600054601e60"
                         + "205463abcddcba6040545b51602001600a525451"
                         + "6040016014525451606001601e52545160800160"
                         + "28525460a052546016604860003960166000f260"
-                        + "00603f556103e75660005460005360200235"));
+                        + "00603f556103e75660005460005360200235"));*/
     }
 
     public ProgramInvokeMockImpl(boolean defaults) {
