@@ -12,29 +12,59 @@ import static org.apache.commons.lang3.ArrayUtils.subarray;
 
 public class Api {
 
-    public static void helloworld(Program program) {
-        CallTransaction.Function fn = CallTransaction.Function.fromSignature("helloworld", new String[]{"uint256", "uint256"}, new String[]{"uint256"});
-        Object[] params = getParams(fn, program.getInvoke().getDataCopy(DataWord.ZERO, program.getInvoke().getDataSize()));
+    private final ApiEnum apiEnum;
+
+    private final Program program;
+
+    private final CallTransaction.Function function;
+
+    private Api(ApiEnum apiEnum, Program program) {
+        this.apiEnum = apiEnum;
+        this.program = program;
+        this.function = apiEnum.getFunction();
+    }
+
+    public static Api create(Program program) {
+        ApiEnum apiEnum = ApiEnum.determin(program);
+        return new Api(apiEnum, program);
+    }
+
+    public ApiEnum getApiEnum() {
+        return apiEnum;
+    }
+
+    public void run() {
+        if (apiEnum == null) {
+            program.setRuntimeFailure(new RuntimeException("functionhash doesn't exist"));
+        }
+        apiEnum.delegate(this);
+    }
+
+    public void helloworld() {
+        //CallTransaction.Function fn = CallTransaction.Function.fromSignature("helloworld", new String[]{"uint256", "uint256"}, new String[]{"uint256","uint256"});
+        Object[] params = getParams();
         BigInteger addr = (BigInteger) params[0];
         BigInteger value = (BigInteger) params[1];
         program.storageSave(new DataWord(addr.longValue()), new DataWord(value.longValue()));
         program.spendGas(10l, "helloworld function");
-        Object[] obj = new Object[1];
-        obj[0] = BigInteger.valueOf(1223l);
-        byte[] res = setResult(fn, obj);
-        program.setHReturn(res);
+        Object[] obj = new Object[2];
+        obj[0] = BigInteger.valueOf(1234);
+        obj[1] = BigInteger.valueOf(5678);
+        //byte[] ret = fn.encodeResult(obj);
+        byte[] res = setResult(obj);
+        System.out.println(res);
         return;
     }
 
     ;
 
-    public static void foo(Program program) {
+    public void foo() {
         return;
     }
 
     ;
 
-    public static void bar(Program program) {
+    public void bar() {
         return;
     }
 
@@ -42,29 +72,25 @@ public class Api {
 
     public static void main(String[] args) {
         CallTransaction.Function fn = CallTransaction.Function.fromSignature("helloworld", new String[]{"uint256", "uint256"}, new String[]{"uint256"});
-        Object[] params = fn.decode(Hex.decode("683dd91100000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"));
-        byte[] sig = fn.encodeSignature();
-        System.out.println(params);
+        System.out.println(Hex.toHexString(fn.encodeSignature()));
+
+        System.out.println(Hex.toHexString(ApiEnum.HELLOWORLD.getFunction().encodeSignature()));
+
         Object[] obj = new Object[2];
         obj[0] = BigInteger.valueOf(1223l);
         obj[1] = BigInteger.valueOf(333l);
-        byte[] res = setResult(fn, obj);
-        System.out.println(res);
+        byte[] ret = fn.encodeResult(obj);
+        System.out.println(ret);
     }
 
-    public static Object[] getParams(CallTransaction.Function fn, byte[] callData) {
-        if (callData.length < 4 || !Arrays.equals(subarray(callData, 0, 4), fn.encodeSignature())) {
-            return null;
-        }
-        Object[] params = fn.decode(callData);
-        if (params.length != fn.inputs.length) {
-            return null;
-        }
-        return params;
+    public Object[] getParams() {
+        byte[] callData = program.getInvoke().getDataCopy(DataWord.ZERO, program.getInvoke().getDataSize());
+        return function.decodeParam(callData);
     }
 
-    public static byte[] setResult(CallTransaction.Function fn, Object[] returns) {
-        byte[] ret = fn.encodeResult(returns);
+    public byte[] setResult(Object[] returns) {
+        byte[] ret = function.encodeResult(returns);
+        program.setHReturn(ret);
         return ret;
     }
 }

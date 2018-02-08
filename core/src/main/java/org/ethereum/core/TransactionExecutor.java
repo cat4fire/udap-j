@@ -189,23 +189,40 @@ public class TransactionExecutor {
 
         //lycrus
         if (!readyToExecute) return;
-        byte[] lycrusAddress = null;
+        //byte[] lycrusAddress = null;
 
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+        //lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
 
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            byte[] targetAddress = tx.getReceiveAddress();
+        //if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+        if (!localCall) {
+            //        track.increaseNonce(tx.getSender());
+
+            BigInteger txGasLimit = toBI(tx.getGasLimit());
+            BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
+            track.addBalance(tx.getSender(), txGasCost.negate());
+
+            if (logger.isInfoEnabled())
+                logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
+        }
             ProgramInvoke programInvoke =
                     programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 //cacheTrack -> track
             //this.vm = new VM(config);
-            byte[] code = track.getCode(targetAddress);
+        //byte[] code = track.getCode(targetAddress);
             this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
+
+        BigInteger endowment = toBI(tx.getValue());
+
+        byte[] targetAddress = tx.getReceiveAddress();
+        transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
+        touchedAccounts.add(targetAddress);
+
+
             return;
-        }
+        // }
         //lycrus
 
-        if (!localCall) {
+        /*if (!localCall) {
             //        track.increaseNonce(tx.getSender());
 
             BigInteger txGasLimit = toBI(tx.getGasLimit());
@@ -217,11 +234,11 @@ public class TransactionExecutor {
         }
 
 
-        /*if (tx.isContractCreation()) {
+        *//*if (tx.isContractCreation()) {
             create();
-        } else {*/
+        } else {*//*
             call();
-        /*}*/
+        *//*}*/
     }
 
     private void call() {
@@ -472,12 +489,12 @@ public class TransactionExecutor {
     public TransactionExecutionSummary finalization() {
 
         //lycrus
-        byte[] lycrusAddress = null;
+        /*byte[] lycrusAddress = null;
 
         lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
         if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
             m_endGas = BigInteger.valueOf(100000l - 50l);
-        }
+        }*/
 
 
         //lycrus

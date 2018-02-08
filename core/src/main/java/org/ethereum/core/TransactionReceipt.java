@@ -40,14 +40,13 @@ public class TransactionReceipt {
 
     private Transaction transaction;
 
-    private byte[] txState = EMPTY_BYTE_ARRAY;
+    private byte[] postTxState = EMPTY_BYTE_ARRAY;
     private byte[] cumulativeGas = EMPTY_BYTE_ARRAY;
     private Bloom bloomFilter = new Bloom();
     private List<LogInfo> logInfoList = new ArrayList<>();
     //private byte[] hReturn = EMPTY_BYTE_ARRAY; here it's called executionResult below
 
     private byte[] gasUsed = EMPTY_BYTE_ARRAY;
-    //which is hReturn
     private byte[] executionResult = EMPTY_BYTE_ARRAY;
     private String error = "";
 
@@ -69,7 +68,7 @@ public class TransactionReceipt {
         RLPItem gasUsedRLP = (RLPItem) receipt.get(4);
         RLPItem result = (RLPItem) receipt.get(5);
 
-        txState = nullToEmpty(postTxStateRLP.getRLPData());
+        postTxState = nullToEmpty(postTxStateRLP.getRLPData());
         cumulativeGas = cumulativeGasRLP.getRLPData();
         bloomFilter = new Bloom(bloomRLP.getRLPData());
         gasUsed = gasUsedRLP.getRLPData();
@@ -89,9 +88,9 @@ public class TransactionReceipt {
     }
 
 
-    public TransactionReceipt(byte[] txState, byte[] cumulativeGas,
+    public TransactionReceipt(byte[] postTxState, byte[] cumulativeGas,
                               Bloom bloomFilter, List<LogInfo> logInfoList) {
-        this.txState = txState;
+        this.postTxState = postTxState;
         this.cumulativeGas = cumulativeGas;
         this.bloomFilter = bloomFilter;
         this.logInfoList = logInfoList;
@@ -99,9 +98,9 @@ public class TransactionReceipt {
 
     public TransactionReceipt(final RLPList rlpList) {
         if (rlpList == null || rlpList.size() != 4)
-            throw new RuntimeException("Should provide RLPList with txState, cumulativeGas, bloomFilter, logInfoList");
+            throw new RuntimeException("Should provide RLPList with postTxState, cumulativeGas, bloomFilter, logInfoList");
 
-        this.txState = rlpList.get(0).getRLPData();
+        this.postTxState = rlpList.get(0).getRLPData();
         this.cumulativeGas = rlpList.get(1).getRLPData();
         this.bloomFilter = new Bloom(rlpList.get(2).getRLPData());
 
@@ -113,8 +112,8 @@ public class TransactionReceipt {
         this.logInfoList = logInfos;
     }
 
-    public byte[] getTxState() {
-        return txState;
+    public byte[] getPostTxState() {
+        return postTxState;
     }
 
     public byte[] getCumulativeGas() {
@@ -156,7 +155,7 @@ public class TransactionReceipt {
 
     /**
      * Used for Receipt trie hash calculation. Should contain only the following items encoded:
-     * [txState, cumulativeGas, bloomFilter, logInfoList]
+     * [postTxState, cumulativeGas, bloomFilter, logInfoList]
      */
     public byte[] getReceiptTrieEncoded() {
         return getEncoded(true);
@@ -175,7 +174,7 @@ public class TransactionReceipt {
 
     public byte[] getEncoded(boolean receiptTrie) {
 
-        byte[] postTxStateRLP = RLP.encodeElement(this.txState);
+        byte[] postTxStateRLP = RLP.encodeElement(this.postTxState);
         byte[] cumulativeGasRLP = RLP.encodeElement(this.cumulativeGas);
         byte[] bloomRLP = RLP.encodeElement(this.bloomFilter.data);
 
@@ -201,22 +200,22 @@ public class TransactionReceipt {
 
     }
 
-    public void setTxState(byte[] txState) {
-        this.txState = txState;
+    public void setPostTxState(byte[] postTxState) {
+        this.postTxState = postTxState;
         rlpEncoded = null;
     }
 
     public void setTxStatus(boolean success) {
-        this.txState = success ? new byte[]{1} : new byte[0];
+        this.postTxState = success ? new byte[]{1} : new byte[0];
         rlpEncoded = null;
     }
 
     public boolean hasTxStatus() {
-        return txState != null && txState.length <= 1;
+        return postTxState != null && postTxState.length <= 1;
     }
 
     public boolean isTxStatusOK() {
-        return txState != null && txState.length == 1 && txState[0] == 1;
+        return postTxState != null && postTxState.length == 1 && postTxState[0] == 1;
     }
 
     public void setCumulativeGas(long cumulativeGas) {
@@ -276,7 +275,7 @@ public class TransactionReceipt {
 
         return "TransactionReceipt[" +
                 "\n  , " + (hasTxStatus() ? ("txStatus=" + (isTxStatusOK() ? "OK" : "FAILED"))
-                : ("txState=" + Hex.toHexString(txState))) +
+                : ("postTxState=" + Hex.toHexString(postTxState))) +
                 "\n  , cumulativeGas=" + Hex.toHexString(cumulativeGas) +
                 "\n  , gasUsed=" + Hex.toHexString(gasUsed) +
                 "\n  , error=" + error +
