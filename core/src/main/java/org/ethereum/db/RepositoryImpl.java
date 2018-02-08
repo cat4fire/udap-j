@@ -62,9 +62,9 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
     }
 
     @Override
-    public synchronized AccountState createAccount(byte[] addr) {
+    public synchronized AccountState createAccount(byte[] addr, BigInteger accountType) {
         AccountState state = new AccountState(config.getBlockchainConfig().getCommonConstants().getInitialNonce(),
-                BigInteger.ZERO);
+                BigInteger.ZERO, accountType);
         accountStateCache.put(addr, state);
         return state;
     }
@@ -79,10 +79,10 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         return accountStateCache.get(addr);
     }
 
-    synchronized AccountState getOrCreateAccountState(byte[] addr) {
+    synchronized AccountState getOrCreateAccountState(byte[] addr, BigInteger accountType) {
         AccountState ret = accountStateCache.get(addr);
         if (ret == null) {
-            ret = createAccount(addr);
+            ret = createAccount(addr, accountType);
         }
         return ret;
     }
@@ -95,14 +95,36 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
 
     @Override
     public synchronized BigInteger increaseNonce(byte[] addr) {
-        AccountState accountState = getOrCreateAccountState(addr);
+        //AccountState accountState = getOrCreateAccountState(addr);//1
+        AccountState accountState = accountStateCache.get(addr);
+        if (accountState == null) {
+            throw new RuntimeException("CODE001");
+        }
+        accountStateCache.put(addr, accountState.withIncrementedNonce());
+        return accountState.getNonce();
+    }
+
+    @Override
+    public synchronized BigInteger increaseNonce(byte[] addr, BigInteger accountType) {
+        AccountState accountState = getOrCreateAccountState(addr, accountType);
         accountStateCache.put(addr, accountState.withIncrementedNonce());
         return accountState.getNonce();
     }
 
     @Override
     public synchronized BigInteger setNonce(byte[] addr, BigInteger nonce) {
-        AccountState accountState = getOrCreateAccountState(addr);
+        //AccountState accountState = getOrCreateAccountState(addr);//2
+        AccountState accountState = accountStateCache.get(addr);
+        if (accountState == null) {
+            throw new RuntimeException("CODE001");
+        }
+        accountStateCache.put(addr, accountState.withNonce(nonce));
+        return accountState.getNonce();
+    }
+
+    @Override
+    public synchronized BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce) {
+        AccountState accountState = getOrCreateAccountState(addr, accountType);
         accountStateCache.put(addr, accountState.withNonce(nonce));
         return accountState.getNonce();
     }
@@ -148,8 +170,21 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
 
     @Override
     public synchronized void addStorageRow(byte[] addr, DataWord key, DataWord value) {
-        getOrCreateAccountState(addr);
+        //getOrCreateAccountState(addr);//3
+        AccountState accountState = accountStateCache.get(addr);
+        if (accountState == null) {
+            throw new RuntimeException("CODE001");
+        }
+        if (accountState.getAccountType() == AccountState.ACCOUNT_TYPE_EXTERNAL) {
+            throw new RuntimeException("CODE002");
+        }
+        Source<DataWord, DataWord> contractStorage = storageCache.get(addr);
+        contractStorage.put(key, value.isZero() ? null : value);
+    }
 
+    @Override
+    public synchronized void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value) {
+        getOrCreateAccountState(addr, accountType);
         Source<DataWord, DataWord> contractStorage = storageCache.get(addr);
         contractStorage.put(key, value.isZero() ? null : value);
     }
@@ -168,7 +203,18 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
 
     @Override
     public synchronized BigInteger addBalance(byte[] addr, BigInteger value) {
-        AccountState accountState = getOrCreateAccountState(addr);
+        //AccountState accountState = getOrCreateAccountState(addr);//4
+        AccountState accountState = accountStateCache.get(addr);
+        if (accountState == null) {
+            throw new RuntimeException("CODE001");
+        }
+        accountStateCache.put(addr, accountState.withBalanceIncrement(value));
+        return accountState.getBalance();
+    }
+
+    @Override
+    public synchronized BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value) {
+        AccountState accountState = getOrCreateAccountState(addr, accountType);
         accountStateCache.put(addr, accountState.withBalanceIncrement(value));
         return accountState.getBalance();
     }

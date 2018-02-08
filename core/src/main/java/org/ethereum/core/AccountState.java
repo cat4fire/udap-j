@@ -73,25 +73,25 @@ public class AccountState {
      */
     private final BigInteger accountType;
 
-    private static BigInteger ACCOUNT_TYPE_EXTERNAL = BigInteger.valueOf(1);
-    private static BigInteger ACCOUNT_TYPE_ASSET_PROTO = BigInteger.valueOf(2);
-    private static BigInteger ACCOUNT_TYPE_ASSET = BigInteger.valueOf(3);
+    public static BigInteger ACCOUNT_TYPE_EXTERNAL = BigInteger.valueOf(1);
+    public static BigInteger ACCOUNT_TYPE_ASSET_PROTO = BigInteger.valueOf(2);
+    public static BigInteger ACCOUNT_TYPE_ASSET = BigInteger.valueOf(3);
 
-    public AccountState(SystemProperties config) {
-        this(config.getBlockchainConfig().getCommonConstants().getInitialNonce(), BigInteger.ZERO);
+    public AccountState(SystemProperties config, BigInteger accountType) {
+        this(config.getBlockchainConfig().getCommonConstants().getInitialNonce(), BigInteger.ZERO, accountType);
     }
 
-    public AccountState(BigInteger nonce, BigInteger balance) {
-        this(nonce, balance, EMPTY_TRIE_HASH/*, EMPTY_DATA_HASH*/, ACCOUNT_TYPE_EXTERNAL);
+    public AccountState(BigInteger nonce, BigInteger balance, BigInteger accountType) {
+        this(nonce, balance, EMPTY_TRIE_HASH/*, EMPTY_DATA_HASH*/, accountType);
     }
 
-    public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot/*, byte[] codeHash*/) {
+    /*public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot*//*, byte[] codeHash*//*) {
         this.nonce = nonce;
         this.balance = balance;
         this.stateRoot = stateRoot == EMPTY_TRIE_HASH || equal(stateRoot, EMPTY_TRIE_HASH) ? EMPTY_TRIE_HASH : stateRoot;
         //this.codeHash = codeHash == EMPTY_DATA_HASH || equal(codeHash, EMPTY_DATA_HASH) ? EMPTY_DATA_HASH : codeHash;
         this.accountType = ACCOUNT_TYPE_EXTERNAL;
-    }
+    }*/
 
     public AccountState(BigInteger nonce, BigInteger balance, byte[] stateRoot/*, byte[] codeHash*/, BigInteger accountType) {
         this.nonce = nonce;
@@ -133,7 +133,7 @@ public class AccountState {
     }
 
     public AccountState withNonce(BigInteger nonce) {
-        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
+        return new AccountState(nonce, balance, stateRoot/*, codeHash*/, accountType);
     }
 
     public byte[] getStateRoot() {
@@ -141,27 +141,31 @@ public class AccountState {
     }
 
     public AccountState withStateRoot(byte[] stateRoot) {
-        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
+        return new AccountState(nonce, balance, stateRoot/*, codeHash*/, accountType);
     }
 
     public AccountState withIncrementedNonce() {
-        return new AccountState(nonce.add(BigInteger.ONE), balance, stateRoot/*, codeHash*/);
+        return new AccountState(nonce.add(BigInteger.ONE), balance, stateRoot/*, codeHash*/, accountType);
+    }
+
+    public AccountState withNewAccountType(BigInteger accountType) {
+        return new AccountState(nonce.add(BigInteger.ONE), balance, stateRoot/*, codeHash*/, accountType);
     }
 
     /*public byte[] getCodeHash() {
         return codeHash;
     }*/
 
-    public AccountState withCodeHash(byte[] codeHash) {
-        return new AccountState(nonce, balance, stateRoot/*, codeHash*/);
-    }
+    /*public AccountState withCodeHash(byte[] codeHash) {
+        return new AccountState(nonce, balance, stateRoot*//*, codeHash*//*);
+    }*/
 
     public BigInteger getBalance() {
         return balance;
     }
 
     public AccountState withBalanceIncrement(BigInteger value) {
-        return new AccountState(nonce, balance.add(value), stateRoot/*, codeHash*/);
+        return new AccountState(nonce, balance.add(value), stateRoot/*, codeHash*/, accountType);
     }
 
     public boolean isContractExist(BlockchainConfig blockchainConfig) {

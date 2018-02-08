@@ -38,7 +38,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr of the contract
      * @return newly created account state
      */
-    AccountState createAccount(byte[] addr);
+    AccountState createAccount(byte[] addr, BigInteger accountType);
 
 
     /**
@@ -71,6 +71,8 @@ public interface Repository extends org.ethereum.facade.Repository {
      */
     BigInteger increaseNonce(byte[] addr);
 
+    BigInteger increaseNonce(byte[] addr, BigInteger accountType);
+
     /**
      * Sets the account nonce of the given account
      *
@@ -79,6 +81,8 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @return new value of the nonce
      */
     BigInteger setNonce(byte[] addr, BigInteger nonce);
+
+    BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce);
 
     /**
      * Get current nonce of a given account
@@ -131,6 +135,8 @@ public interface Repository extends org.ethereum.facade.Repository {
      */
     void addStorageRow(byte[] addr, DataWord key, DataWord value);
 
+    void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value);
+
 
     /**
      * Retrieve storage value from an account for a given key
@@ -158,6 +164,8 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @return new balance of the account
      */
     BigInteger addBalance(byte[] addr, BigInteger value);
+
+    BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value);
 
     /**
      * @return Returns set of all the account addresses

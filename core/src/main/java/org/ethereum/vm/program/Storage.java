@@ -51,8 +51,8 @@ public class Storage implements Repository, ProgramListenerAware {
     }
 
     @Override
-    public AccountState createAccount(byte[] addr) {
-        return repository.createAccount(addr);
+    public AccountState createAccount(byte[] addr, BigInteger accountType) {
+        return repository.createAccount(addr, accountType);
     }
 
     @Override

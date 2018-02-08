@@ -47,8 +47,8 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
-    public AccountState createAccount(byte[] addr) {
-        return blockchain.getRepository().createAccount(addr);
+    public AccountState createAccount(byte[] addr, BigInteger accountType) {
+        return blockchain.getRepository().createAccount(addr, accountType);
     }
 
     @Override

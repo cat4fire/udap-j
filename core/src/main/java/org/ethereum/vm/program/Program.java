@@ -20,6 +20,7 @@ package org.ethereum.vm.program;
 import org.ethereum.config.BlockchainConfig;
 import org.ethereum.config.CommonConfig;
 import org.ethereum.config.SystemProperties;
+import org.ethereum.core.AccountState;
 import org.ethereum.core.Repository;
 import org.ethereum.core.Transaction;
 import org.ethereum.util.FastByteComparisons;
@@ -197,6 +198,11 @@ public class Program {
         DataWord keyWord = new DataWord(key);
         DataWord valWord = new DataWord(val);
         getStorage().addStorageRow(getOwnerAddress().getLast20Bytes(), keyWord, valWord);
+    }
+
+    public void createAccount(byte[] addr, BigInteger accountType) {
+        getStorage().createAccount(addr, accountType);
+        return;
     }
 
     public DataWord getOwnerAddress() {
