@@ -45,14 +45,14 @@ public class Api {
         Object[] params = getParams();
         BigInteger addr = (BigInteger) params[0];
         BigInteger value = (BigInteger) params[1];
-        program.storageSave(new DataWord(addr.longValue()), new DataWord(value.longValue()));
+        DataWord load = program.storageLoad(getTargetAddress(), new DataWord(addr.longValue()));
+        program.storageSave(getTargetAddress(), new DataWord(addr.longValue()), new DataWord(value.longValue()));
         program.spendGas(10l, "helloworld function");
-        Object[] obj = new Object[2];
-        obj[0] = BigInteger.valueOf(1234);
-        obj[1] = BigInteger.valueOf(5678);
-        //byte[] ret = fn.encodeResult(obj);
+        Object[] obj = new Object[1];
+        obj[0] = BigInteger.valueOf(1234);//0x04d2
+
         byte[] res = setResult(obj);
-        System.out.println(res);
+
         return;
     }
 
@@ -86,6 +86,10 @@ public class Api {
     public Object[] getParams() {
         byte[] callData = program.getInvoke().getDataCopy(DataWord.ZERO, program.getInvoke().getDataSize());
         return function.decodeParam(callData);
+    }
+
+    public DataWord getTargetAddress() {
+        return program.getInvoke().getOwnerAddress();
     }
 
     public byte[] setResult(Object[] returns) {

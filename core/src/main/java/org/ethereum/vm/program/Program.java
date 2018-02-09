@@ -656,11 +656,18 @@ public class Program {
         storageSave(word1.getData(), word2.getData());
     }
 
+    public void storageSave(DataWord accountAddress, DataWord word1, DataWord word2) {
+        byte[] addr = accountAddress.getLast20Bytes();
+        getStorage().addStorageRow(addr, word2, word2);
+        result.addTouchAccount(accountAddress.getLast20Bytes());
+    }
+
     public void storageSave(byte[] key, byte[] val) {
         DataWord keyWord = new DataWord(key);
         DataWord valWord = new DataWord(val);
         getStorage().addStorageRow(getOwnerAddress().getLast20Bytes(), keyWord, valWord);
     }
+
 
     /*public byte[] getCode() {
         return ops;
@@ -738,6 +745,12 @@ public class Program {
 
     public DataWord storageLoad(DataWord key) {
         DataWord ret = getStorage().getStorageValue(getOwnerAddress().getLast20Bytes(), key.clone());
+        return ret == null ? null : ret.clone();
+    }
+
+    public DataWord storageLoad(DataWord accountAddress, DataWord key) {
+        byte[] addr = accountAddress.getLast20Bytes();
+        DataWord ret = getStorage().getStorageValue(addr, key.clone());
         return ret == null ? null : ret.clone();
     }
 
