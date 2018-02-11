@@ -272,6 +272,7 @@ public class BlockMiner {
                 task.addListener(() -> {
                     try {
                         // wow, block mined!
+                        System.out.println("wow block mined");
                         final Block minedBlock = task.get().block;
                         blockMined(minedBlock);
                     } catch (InterruptedException | CancellationException e) {

@@ -44,7 +44,7 @@ public class AnyFuture<V> extends AbstractFuture<V> {
     private synchronized void futureCompleted(ListenableFuture<V> f) {
         if (isCancelled() || isDone()) return;
         if (f.isCancelled()) return;
-
+        System.out.println("AnyFuture futureCompleted");
         try {
             cancelOthers(f);
 

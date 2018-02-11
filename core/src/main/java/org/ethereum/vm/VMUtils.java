@@ -32,6 +32,7 @@ import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 import static org.springframework.util.StringUtils.isEmpty;
 
+/*
 public final class VMUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("VM");
@@ -154,3 +155,4 @@ public final class VMUtils {
         }
     }
 }
+*/
