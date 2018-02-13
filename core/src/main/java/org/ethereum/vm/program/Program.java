@@ -658,7 +658,7 @@ public class Program {
 
     public void storageSave(DataWord accountAddress, DataWord word1, DataWord word2) {
         byte[] addr = accountAddress.getLast20Bytes();
-        getStorage().addStorageRow(addr, word2, word2);
+        getStorage().addStorageRow(addr, word1, word2);
         result.addTouchAccount(accountAddress.getLast20Bytes());
     }
 

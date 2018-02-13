@@ -1,5 +1,6 @@
 package org.ethereum.vm;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ethereum.core.CallTransaction;
 import org.ethereum.vm.program.Program;
 import org.spongycastle.jcajce.provider.digest.SHA3;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 
 import static org.apache.commons.lang3.ArrayUtils.subarray;
 
+@Slf4j(topic = "api")
 public class Api {
 
     private final ApiEnum apiEnum;
@@ -46,6 +48,7 @@ public class Api {
         BigInteger addr = (BigInteger) params[0];
         BigInteger value = (BigInteger) params[1];
         DataWord load = program.storageLoad(getTargetAddress(), new DataWord(addr.longValue()));
+        log.debug("api-helloworld !!!! acc : {} addr : {} data : {}", Hex.toHexString(getTargetAddress().getLast20Bytes()), addr, value);
         program.storageSave(getTargetAddress(), new DataWord(addr.longValue()), new DataWord(value.longValue()));
         program.spendGas(10l, "helloworld function");
         Object[] obj = new Object[1];
