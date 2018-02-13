@@ -513,7 +513,7 @@ var BlockchainView = (function () {
         };
         $.post('/rpc', JSON.stringify(data), function (resp) {
             if (resp.result && resp.result.transactions.length > 0) {
-                console.log('Transactions of ' + resp.result.blockHash.substring(0, 6));
+                console.log('Transactions of ' + d.blockHash.substring(0, 6));
                 console.log(JSON.stringify(resp.result.transactions, 0, 2));
             } else {
                 console.log('No transactions in block' + d.blockHash.substring(0, 6));
