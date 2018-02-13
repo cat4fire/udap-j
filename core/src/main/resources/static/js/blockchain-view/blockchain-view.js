@@ -367,6 +367,7 @@ var BlockchainView = (function () {
                 //    difficulty : d.difficulty + 1,
                 //    parentHash : d.parentHash
                 //}]);
+                printTransactionsToConsole(d);
             })
             .attr('opacity', 0)
             .transition()
@@ -501,6 +502,23 @@ var BlockchainView = (function () {
             .attr('fill', 'none');
 
         drawParentLines(svgContainer, width, height);
+    }
+
+    function printTransactionsToConsole(d) {
+        var data = {
+            'jsonrpc': '2.0',
+            'method': 'eth_getBlockByHash',
+            'params': [d.blockHash, true],
+            'id': Date.now()
+        };
+        $.post('/rpc', JSON.stringify(data), function (resp) {
+            if (resp.result && resp.result.transactions.length > 0) {
+                console.log('Transactions of ' + resp.result.blockHash.substring(0, 6));
+                console.log(JSON.stringify(resp.result.transactions, 0, 2));
+            } else {
+                console.log('No transactions in block' + d.blockHash.substring(0, 6));
+            }
+        });
     }
 
     function drawParentLines(svgContainer, width, height) {
