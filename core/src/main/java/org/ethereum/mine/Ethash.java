@@ -207,10 +207,17 @@ public class Ethash {
 
             @Override
             public MiningResult call() throws Exception {
+                logger.debug("lycrus mine call miningresult");
                 long threadStartNonce = taskStartNonce.getAndAdd(0x100000000L);
                 long nonce = getEthashAlgo().mine(getFullSize(), getFullDataset(), sha3(block.getHeader().getEncodedWithoutNonce()), ByteUtil.byteArrayToLong(block.getHeader().getDifficulty()), threadStartNonce);
                 final Pair<byte[], byte[]> pair = hashimotoLight(block.getHeader(), nonce);
-                return new MiningResult(nonce, pair.getLeft(), block);
+                MiningResult ret = new MiningResult(nonce, pair.getLeft(), block);
+                logger.debug("mining result : " + ret);
+                logger.debug("tx size : " + block.getTransactionsList().size());
+                if (ret == null) {
+                    logger.debug("how could this be");
+                }
+                return ret;
             }
         }).submit();
     }

@@ -4,6 +4,7 @@
     <!--
         If variable is not defined in system properties -> try to load it from application.properties
     -->
+    <!--TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF-->
     <if condition='!isDefined("logs.dir")'>
         <then>
             <property resource="application.properties"/>
@@ -15,7 +16,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>A%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
@@ -32,10 +33,10 @@
             <totalSizeCap>500MB</totalSizeCap>
         </rollingPolicy>
         <encoder>
-            <pattern>D%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
+            <level>TRACE</level>
         </filter>
     </appender>
 

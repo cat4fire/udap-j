@@ -55,7 +55,7 @@ import java.util.Map;
 
 import static org.ethereum.crypto.HashUtil.shortHash;
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
+//import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
 
 /**
  * @author Roman Mandeleil

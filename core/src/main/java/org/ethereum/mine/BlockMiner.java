@@ -272,13 +272,15 @@ public class BlockMiner {
                 task.addListener(() -> {
                     try {
                         // wow, block mined!
-                        System.out.println("wow block mined");
+                        logger.debug("wow block mined");
                         final Block minedBlock = task.get().block;
                         blockMined(minedBlock);
                     } catch (InterruptedException | CancellationException e) {
                         // OK, we've been cancelled, just exit
+                        logger.warn("CancellationException occured in mining, that's OK");
                     } catch (Exception e) {
-                        logger.warn("Exception during mining: ", e);
+                        logger.error("exception while mining : " + e);
+                        //logger.warn("Exception during mining: ", e);
                     }
                 }, MoreExecutors.sameThreadExecutor());
             }
@@ -305,8 +307,9 @@ public class BlockMiner {
         }
 
         fireBlockMined(newBlock);
-        logger.info("Wow, block mined !!!: {}", newBlock.toString());
-
+        if (newBlock.getTransactionsList().size() != 0) {
+            logger.info("Wow, block mined !!!: {}", newBlock.toString());
+        }
         lastBlockMinedTime = t;
         miningBlock = null;
         // cancel all tasks

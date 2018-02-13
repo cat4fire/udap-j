@@ -83,7 +83,8 @@ public abstract class AbstractConfig implements BlockchainConfig, BlockchainNetC
 
     @Override
     public BigInteger calcDifficulty(BlockHeader curBlock, BlockHeader parent) {
-        BigInteger pd = parent.getDifficultyBI();
+        return BigInteger.valueOf(0x4fff);
+        /*BigInteger pd = parent.getDifficultyBI();
         BigInteger quotient = pd.divide(getConstants().getDIFFICULTY_BOUND_DIVISOR());
 
         BigInteger sign = getCalcDifficultyMultiplier(curBlock, parent);
@@ -97,7 +98,7 @@ public abstract class AbstractConfig implements BlockchainConfig, BlockchainNetC
             difficulty = max(getConstants().getMINIMUM_DIFFICULTY(), difficulty.add(BigInteger.ONE.shiftLeft(explosion)));
         }
 
-        return difficulty;
+        return difficulty;*/
     }
 
     protected int getExplosion(BlockHeader curBlock, BlockHeader parent) {
