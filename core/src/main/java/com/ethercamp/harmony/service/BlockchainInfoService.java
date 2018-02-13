@@ -180,7 +180,8 @@ public class BlockchainInfoService implements ApplicationListener {
                 block.getNumber(),
                 Hex.toHexString(block.getHash()),
                 Hex.toHexString(block.getParentHash()),
-                block.getDifficultyBI().longValue()
+                block.getDifficultyBI().longValue(),
+                block.getTransactionsList().size() > 0
         );
         lastBlocksForClient.add(blockInfo);
         clientMessageService.sendToTopic("/topic/newBlockInfo", blockInfo);

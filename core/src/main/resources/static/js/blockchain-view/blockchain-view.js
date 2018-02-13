@@ -352,7 +352,9 @@ var BlockchainView = (function () {
             .attr('y', 0)
             .attr('width', BLOCK_WIDTH)
             .attr('height', BLOCK_HEIGHT)
-            .style('fill', '#5E9CD3')
+            .style('fill', function (d, i) {
+                return d.hasTransaction ? '#DB524B' : '#5E9CD3';
+            })
             .style('stroke-opacity', 0)
             .style('stroke', '#41719C')
             .style('stroke-width', 2)
