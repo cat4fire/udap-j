@@ -70,6 +70,8 @@ import static java.util.stream.Collectors.*;
 @Slf4j(topic = "harmony")
 public class BlockchainInfoService implements ApplicationListener {
 
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger("wallet");
+
     public static final int KEEP_LOG_ENTRIES = 1000;
     private static final int BLOCK_COUNT_FOR_HASH_RATE = 100;
     private static final int KEEP_BLOCKS_FOR_CLIENT = 50;
@@ -180,7 +182,8 @@ public class BlockchainInfoService implements ApplicationListener {
                 block.getNumber(),
                 Hex.toHexString(block.getHash()),
                 Hex.toHexString(block.getParentHash()),
-                block.getDifficultyBI().longValue()
+                block.getDifficultyBI().longValue(),
+                block.getTransactionsList().size() > 0
         );
         lastBlocksForClient.add(blockInfo);
         clientMessageService.sendToTopic("/topic/newBlockInfo", blockInfo);
@@ -236,13 +239,14 @@ public class BlockchainInfoService implements ApplicationListener {
 
             final String ANSI_RESET = "\u001B[0m";
             final String ANSI_BLUE = "\u001B[34m";
-            System.out.println("EthereumJ database dir location: " + systemProperties.databaseDir());
-            System.out.println("EthereumJ keystore dir location: " + keystore.getKeyStoreLocation());
-            System.out.println(ANSI_BLUE + "Server started at http://localhost:" + serverPort + "" + ANSI_RESET);
+            log.info("EthereumJ database dir location: " + systemProperties.databaseDir());
+            log.info("EthereumJ keystore dir location: " + keystore.getKeyStoreLocation());
+            log.info(ANSI_BLUE + "Server started at http://localhost:" + serverPort + "" + ANSI_RESET);
 
             if (!config.getConfig().hasPath("logs.keepStdOut") || !config.getConfig().getBoolean("logs.keepStdOut")) {
                 createLogAppenderForMessaging();
             }
+
         }
     }
 
@@ -400,7 +404,7 @@ public class BlockchainInfoService implements ApplicationListener {
         };
 
         final Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        Optional.ofNullable(root.getAppender("STDOUT"))
+        /*Optional.ofNullable(root.getAppender("STDOUT"))
                 .ifPresent(stdout -> {
                     stdout.stop();
                     stdout.clearAllFilters();
@@ -410,11 +414,12 @@ public class BlockchainInfoService implements ApplicationListener {
                     stdout.addFilter(filter);
                     filter.start();
                     stdout.start();
-                });
+                });*/
 
 
         final ThresholdFilter filter = new ThresholdFilter();
-        filter.setLevel(Level.INFO.toString());
+        //filter.setLevel(Level.INFO.toString());
+        filter.setLevel(Level.ALL.toString());
         messagingAppender.addFilter(filter); // No effect of this
         messagingAppender.setName("ClientMessagingAppender");
         messagingAppender.setContext(context);

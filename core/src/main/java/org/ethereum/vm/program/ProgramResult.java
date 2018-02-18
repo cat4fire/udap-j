@@ -44,7 +44,7 @@ public class ProgramResult {
 
     private Set<DataWord> deleteAccounts;
     private ByteArraySet touchedAccounts = new ByteArraySet();
-    //private List<InternalTransaction> internalTransactions;
+    private List<InternalTransaction> internalTransactions;
     private List<LogInfo> logInfoList;
     private long futureRefund = 0;
 
@@ -151,29 +151,29 @@ public class ProgramResult {
         getCallCreateList().add(new CallCreate(data, destination, gasLimit, value));
     }
 
-    /*public List<InternalTransaction> getInternalTransactions() {
+    public List<InternalTransaction> getInternalTransactions() {
         if (internalTransactions == null) {
             internalTransactions = new ArrayList<>();
         }
         return internalTransactions;
-    }*/
+    }
 
-    /*public InternalTransaction addInternalTransaction(byte[] parentHash, int deep, byte[] nonce, DataWord gasPrice, DataWord gasLimit,
+    public InternalTransaction addInternalTransaction(byte[] parentHash, int deep, byte[] nonce, DataWord gasPrice, DataWord gasLimit,
                                                       byte[] senderAddress, byte[] receiveAddress, byte[] value, byte[] data, String note) {
         InternalTransaction transaction = new InternalTransaction(parentHash, deep, size(internalTransactions), nonce, gasPrice, gasLimit, senderAddress, receiveAddress, value, data, note);
         getInternalTransactions().add(transaction);
         return transaction;
-    }*/
+    }
 
-    /*public void addInternalTransactions(List<InternalTransaction> internalTransactions) {
+    public void addInternalTransactions(List<InternalTransaction> internalTransactions) {
         getInternalTransactions().addAll(internalTransactions);
-    }*/
+    }
 
-    /*public void rejectInternalTransactions() {
+    public void rejectInternalTransactions() {
         for (InternalTransaction internalTx : getInternalTransactions()) {
             internalTx.reject();
         }
-    }*/
+    }
 
     public void addFutureRefund(long gasValue) {
         futureRefund += gasValue;
@@ -188,7 +188,7 @@ public class ProgramResult {
     }
 
     public void merge(ProgramResult another) {
-        //addInternalTransactions(another.getInternalTransactions());
+        addInternalTransactions(another.getInternalTransactions());
         if (another.getException() == null && !another.isRevert()) {
             addDeleteAccounts(another.getDeleteAccounts());
             addLogInfos(another.getLogInfoList());

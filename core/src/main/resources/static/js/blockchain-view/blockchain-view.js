@@ -352,7 +352,9 @@ var BlockchainView = (function () {
             .attr('y', 0)
             .attr('width', BLOCK_WIDTH)
             .attr('height', BLOCK_HEIGHT)
-            .style('fill', '#5E9CD3')
+            .style('fill', function (d, i) {
+                return d.hasTransaction ? '#DB524B' : '#5E9CD3';
+            })
             .style('stroke-opacity', 0)
             .style('stroke', '#41719C')
             .style('stroke-width', 2)
@@ -367,6 +369,7 @@ var BlockchainView = (function () {
                 //    difficulty : d.difficulty + 1,
                 //    parentHash : d.parentHash
                 //}]);
+                printTransactionsToConsole(d);
             })
             .attr('opacity', 0)
             .transition()
@@ -501,6 +504,23 @@ var BlockchainView = (function () {
             .attr('fill', 'none');
 
         drawParentLines(svgContainer, width, height);
+    }
+
+    function printTransactionsToConsole(d) {
+        var data = {
+            'jsonrpc': '2.0',
+            'method': 'eth_getBlockByHash',
+            'params': [d.blockHash, true],
+            'id': Date.now()
+        };
+        $.post('/rpc', JSON.stringify(data), function (resp) {
+            if (resp.result && resp.result.transactions.length > 0) {
+                console.log('Transactions of block 0x' + d.blockHash.substring(0, 4));
+                console.log(JSON.stringify(resp.result.transactions, 0, 2));
+            } else {
+                console.log('No transactions in block 0x' + d.blockHash.substring(0, 4));
+            }
+        });
     }
 
     function drawParentLines(svgContainer, width, height) {

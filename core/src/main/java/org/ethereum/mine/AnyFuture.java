@@ -20,6 +20,8 @@ package org.ethereum.mine;
 import com.google.common.util.concurrent.AbstractFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,7 @@ import java.util.List;
  * upon completion.
  */
 public class AnyFuture<V> extends AbstractFuture<V> {
+    private static final Logger logger = LoggerFactory.getLogger("mine");
     private List<ListenableFuture<V>> futures = new ArrayList<>();
 
     /**
@@ -44,7 +47,7 @@ public class AnyFuture<V> extends AbstractFuture<V> {
     private synchronized void futureCompleted(ListenableFuture<V> f) {
         if (isCancelled() || isDone()) return;
         if (f.isCancelled()) return;
-
+        logger.debug("AnyFuture futureCompleted");
         try {
             cancelOthers(f);
 
@@ -52,6 +55,7 @@ public class AnyFuture<V> extends AbstractFuture<V> {
             postProcess(v);
             set(v);
         } catch (Exception e) {
+            logger.error("AnyFuture Exception\n" + e);
             setException(e);
         }
     }

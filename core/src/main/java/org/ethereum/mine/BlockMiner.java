@@ -32,6 +32,7 @@ import org.ethereum.listener.EthereumListenerAdapter;
 import org.ethereum.mine.MinerIfc.MiningResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -272,12 +273,18 @@ public class BlockMiner {
                 task.addListener(() -> {
                     try {
                         // wow, block mined!
+                        logger.debug("wow block mined");
                         final Block minedBlock = task.get().block;
+                        if (minedBlock.getTransactionsList().size() != 0) {
+                            logger.debug("!!!!!!!!!!!!!!! block mined with tx : " + Hex.toHexString(minedBlock.getTransactionsList().get(0).getHash()));
+                        }
                         blockMined(minedBlock);
                     } catch (InterruptedException | CancellationException e) {
                         // OK, we've been cancelled, just exit
+                        logger.warn("CancellationException occured in mining, that's OK");
                     } catch (Exception e) {
-                        logger.warn("Exception during mining: ", e);
+                        logger.error("exception while mining : " + e);
+                        //logger.warn("Exception during mining: ", e);
                     }
                 }, MoreExecutors.sameThreadExecutor());
             }
@@ -304,8 +311,9 @@ public class BlockMiner {
         }
 
         fireBlockMined(newBlock);
-        logger.info("Wow, block mined !!!: {}", newBlock.toString());
-
+        if (newBlock.getTransactionsList().size() != 0) {
+            logger.info("Wow, block mined !!!: {}", newBlock.toString());
+        }
         lastBlockMinedTime = t;
         miningBlock = null;
         // cancel all tasks

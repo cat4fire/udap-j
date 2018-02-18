@@ -215,6 +215,7 @@ public class EthashAlgo {
         BigInteger target = valueOf(2).pow(256).divide(valueOf(difficulty));
         while (!Thread.currentThread().isInterrupted()) {
             nonce++;
+            //  System.out.println("ethash mine nonce = " + nonce);
             Pair<byte[], byte[]> pair = hashimotoFull(fullSize, dataset, blockHeaderTruncHash, longToBytes(nonce));
             BigInteger h = new BigInteger(1, pair.getRight() /* ?? */);
             if (h.compareTo(target) < 0) break;

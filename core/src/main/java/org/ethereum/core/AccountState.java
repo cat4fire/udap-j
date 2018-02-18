@@ -30,6 +30,8 @@ import java.io.Externalizable;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE.EXTERNAL;
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE.explain;
 import static org.ethereum.crypto.HashUtil.*;
 import static org.ethereum.util.FastByteComparisons.equal;
 

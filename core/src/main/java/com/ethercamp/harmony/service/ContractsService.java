@@ -18,7 +18,7 @@
 
 package com.ethercamp.harmony.service;
 
-import com.ethercamp.contrdata.ContractDataService;
+/*import com.ethercamp.contrdata.ContractDataService;
 import com.ethercamp.contrdata.contract.Ast;
 import com.ethercamp.contrdata.contract.ContractData;
 import com.ethercamp.contrdata.storage.Path;
@@ -27,8 +27,8 @@ import com.ethercamp.contrdata.storage.StorageEntry;
 import com.ethercamp.contrdata.storage.StoragePage;
 import com.ethercamp.contrdata.storage.dictionary.Layout;
 import com.ethercamp.contrdata.storage.dictionary.StorageDictionary;
-import com.ethercamp.contrdata.storage.dictionary.StorageDictionaryDb;
-import com.ethercamp.contrdata.storage.dictionary.StorageDictionaryVmHook;
+import com.ethercamp.contrdata.storage.dictionary.StorageDictionaryDb;*/
+//import com.ethercamp.contrdata.storage.dictionary.StorageDictionaryVmHook;
 import com.ethercamp.harmony.service.contracts.Source;
 import com.ethercamp.harmony.util.SolcUtils;
 import com.ethercamp.harmony.util.TrustSSL;
@@ -100,7 +100,7 @@ import com.ethercamp.harmony.model.dto.ContractObjects.*;
  * <p>
  * Created by Stan Reshetnyk on 17.10.16.
  */
-@Slf4j(topic = "contracts")
+/*@Slf4j(topic = "contracts")
 @Service
 public class ContractsService {
 
@@ -110,8 +110,8 @@ public class ContractsService {
 
     private static final byte[] SYNCED_BLOCK_KEY = "syncedBlock".getBytes(UTF_8);
 
-    @Autowired
-    StorageDictionaryVmHook storageDictionaryVmHook;
+    *//*@Autowired
+    StorageDictionaryVmHook storageDictionaryVmHook;*//*
 
     @Autowired
     ContractDataService contractDataService;
@@ -140,10 +140,10 @@ public class ContractsService {
 
     DbSource<byte[]> contractCreation;
 
-    /**
+    *//**
      * Contract data will be fully available from this block.
      * Usually this is pivot block in fast sync or zero block for regular sync.
-     */
+     *//*
     volatile Optional<Long> syncedBlock = Optional.empty();   // undetected yet
 
     ObjectToBytesFormat<ContractEntity> contractFormat = new ObjectToBytesFormat<>(ContractEntity.class);
@@ -229,13 +229,13 @@ public class ContractsService {
                 syncedBlock.orElse(-1L));
     }
 
-    /**
+    *//**
      * Get contract storage entries.
      *
      * @param hexAddress - address of contract
      * @param path       - nested level of fields
      * @param pageable   - for paging
-     */
+     *//*
     public Page<StorageEntry> getContractStorage(String hexAddress, String path, Pageable pageable) {
         final byte[] address = Hex.decode(hexAddress);
         final ContractEntity contract = Optional.ofNullable(contractsStorage.get(address))
@@ -353,23 +353,23 @@ public class ContractsService {
     }
 
     private String getAsm(String code) {
-        /*if (isBlank(code)) return StringUtils.EMPTY;
+        *//*if (isBlank(code)) return StringUtils.EMPTY;
 
         try {
             return Program.stringify(Hex.decode(code));
         } catch (Program.IllegalOperationException e) {
             return e.getMessage();
-        }*/
+        }*//*
         return "";
     }
 
-    /**
+    *//**
      * Try to compile each file and check if it's interface matches to asm functions hashes
      * at the deployed contract.
      * Save contract if valid one is found, or merge names.
      *
      * @return contract name(s) from matched file
-     */
+     *//*
     private ContractInfoDTO compileAndSave(String hexAddress, List<String> files) {
         final byte[] address = Hex.decode(hexAddress);
 
@@ -477,9 +477,9 @@ public class ContractsService {
         return true;
     }
 
-    /**
+    *//**
      * For testing purpose.
-     */
+     *//*
     public void clearContractStorage(String hexAddress) throws Exception {
         final byte[] address = Hex.decode(hexAddress);
         log.info("Clear storage of contract:{}", hexAddress);
@@ -520,9 +520,9 @@ public class ContractsService {
 
     }
 
-    /**
+    *//**
      * For storing in key-value database in json format.
-     */
+     *//*
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -536,9 +536,9 @@ public class ContractsService {
 
     }
 
-    /**
+    *//**
      * Helper for encoding/decoding entity to bytes via json intermediate step.
-     */
+     *//*
     public static class ObjectToBytesFormat<T> {
 
         final ObjectMapper mapper = new ObjectMapper();
@@ -566,4 +566,4 @@ public class ContractsService {
             }
         }
     }
-}
+}*/

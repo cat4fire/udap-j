@@ -18,7 +18,7 @@
 
 package com.ethercamp.harmony.service.contracts;
 
-import com.ethercamp.contrdata.storage.Storage;
+//import com.ethercamp.contrdata.storage.Storage;
 import org.ethereum.facade.Repository;
 import org.ethereum.vm.DataWord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+/*@Component
 public class StorageImpl implements Storage {
 
     @Autowired
@@ -63,4 +63,4 @@ public class StorageImpl implements Storage {
     public DataWord get(byte[] address, DataWord key) {
         return repository.getStorageValue(address, key);
     }
-}
+}*/

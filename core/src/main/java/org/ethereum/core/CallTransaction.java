@@ -189,8 +189,8 @@ public class CallTransaction {
             return ret;
         }
 
-        public Object[] decode(byte[] encoded) {
-            return decode(subarray(encoded, 4, encoded.length), inputs);
+        public Object[] decodeParam(byte[] encodedCalldata) {
+            return decode(subarray(encodedCalldata, 4, encodedCalldata.length), inputs);
         }
 
         public Object[] decodeResult(byte[] encodedRet) {
@@ -309,7 +309,7 @@ public class CallTransaction {
             if (data.length < 4) throw new RuntimeException("Invalid data length: " + data.length);
             Function function = getBySignatureHash(Arrays.copyOfRange(data, 0, 4));
             if (function == null) throw new RuntimeException("Can't find function/event by it signature");
-            Object[] args = function.decode(data);
+            Object[] args = function.decodeParam(data);
             return new Invocation(this, function, args);
         }
 

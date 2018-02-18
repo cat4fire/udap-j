@@ -17,6 +17,7 @@
  */
 package org.ethereum.facade;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.ethereum.config.BlockchainConfig;
 import org.ethereum.config.CommonConfig;
 import org.ethereum.config.SystemProperties;
@@ -260,7 +261,7 @@ public class EthereumImpl implements Ethereum, SmartLifecycle {
                 txTrack.commit();
 
                 TransactionReceipt receipt = executor.getReceipt();
-                receipt.setTxState(track.getRoot());
+                receipt.setPostTxState(track.getRoot());
                 receipts.add(receipt);
                 summaries.add(summary);
             }

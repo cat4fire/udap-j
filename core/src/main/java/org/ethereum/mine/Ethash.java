@@ -51,9 +51,7 @@ public class Ethash {
     private static Ethash cachedInstance = null;
     private static long cachedBlockEpoch = 0;
     //    private static ExecutorService executor = Executors.newSingleThreadExecutor();
-    private static ListeningExecutorService executor = MoreExecutors.listeningDecorator(
-            new ThreadPoolExecutor(8, 8, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
-                    new ThreadFactoryBuilder().setNameFormat("ethash-pool-%d").build()));
+    private static ListeningExecutorService executor = MoreExecutors.listeningDecorator(new ThreadPoolExecutor(8, 8, 0L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new ThreadFactoryBuilder().setNameFormat("ethash-pool-%d").build()));
 
     public static boolean fileCacheEnabled = true;
 
@@ -105,8 +103,7 @@ public class Ethash {
 
             if (cacheLight == null) {
                 logger.info("Calculating light dataset...");
-                cacheLight = getEthashAlgo().makeCache(getEthashAlgo().getParams().getCacheSize(blockNumber),
-                        getEthashAlgo().getSeedHash(blockNumber));
+                cacheLight = getEthashAlgo().makeCache(getEthashAlgo().getParams().getCacheSize(blockNumber), getEthashAlgo().getSeedHash(blockNumber));
                 logger.info("Light dataset calculated.");
 
                 if (fileCacheEnabled) {
@@ -179,16 +176,14 @@ public class Ethash {
     }
 
     private Pair<byte[], byte[]> hashimotoLight(BlockHeader header, byte[] nonce) {
-        return getEthashAlgo().hashimotoLight(getFullSize(), getCacheLight(),
-                sha3(header.getEncodedWithoutNonce()), nonce);
+        return getEthashAlgo().hashimotoLight(getFullSize(), getCacheLight(), sha3(header.getEncodedWithoutNonce()), nonce);
     }
 
     /**
      * See {@link EthashAlgo#hashimotoFull}
      */
     public Pair<byte[], byte[]> hashimotoFull(BlockHeader header, long nonce) {
-        return getEthashAlgo().hashimotoFull(getFullSize(), getFullDataset(), sha3(header.getEncodedWithoutNonce()),
-                longToBytes(nonce));
+        return getEthashAlgo().hashimotoFull(getFullSize(), getFullDataset(), sha3(header.getEncodedWithoutNonce()), longToBytes(nonce));
     }
 
     public ListenableFuture<MiningResult> mine(final Block block) {
@@ -212,12 +207,17 @@ public class Ethash {
 
             @Override
             public MiningResult call() throws Exception {
+                logger.debug("lycrus mine call miningresult");
                 long threadStartNonce = taskStartNonce.getAndAdd(0x100000000L);
-                long nonce = getEthashAlgo().mine(getFullSize(), getFullDataset(),
-                        sha3(block.getHeader().getEncodedWithoutNonce()),
-                        ByteUtil.byteArrayToLong(block.getHeader().getDifficulty()), threadStartNonce);
+                long nonce = getEthashAlgo().mine(getFullSize(), getFullDataset(), sha3(block.getHeader().getEncodedWithoutNonce()), ByteUtil.byteArrayToLong(block.getHeader().getDifficulty()), threadStartNonce);
                 final Pair<byte[], byte[]> pair = hashimotoLight(block.getHeader(), nonce);
-                return new MiningResult(nonce, pair.getLeft(), block);
+                MiningResult ret = new MiningResult(nonce, pair.getLeft(), block);
+                logger.debug("mining result : " + ret);
+                logger.debug("tx size : " + block.getTransactionsList().size());
+                if (ret == null) {
+                    logger.debug("how could this be");
+                }
+                return ret;
             }
         }).submit();
     }
@@ -244,9 +244,7 @@ public class Ethash {
             @Override
             public MiningResult call() throws Exception {
                 long threadStartNonce = taskStartNonce.getAndAdd(0x100000000L);
-                final long nonce = getEthashAlgo().mineLight(getFullSize(), getCacheLight(),
-                        sha3(block.getHeader().getEncodedWithoutNonce()),
-                        ByteUtil.byteArrayToLong(block.getHeader().getDifficulty()), threadStartNonce);
+                final long nonce = getEthashAlgo().mineLight(getFullSize(), getCacheLight(), sha3(block.getHeader().getEncodedWithoutNonce()), ByteUtil.byteArrayToLong(block.getHeader().getDifficulty()), threadStartNonce);
                 final Pair<byte[], byte[]> pair = hashimotoLight(block.getHeader(), nonce);
                 return new MiningResult(nonce, pair.getLeft(), block);
             }

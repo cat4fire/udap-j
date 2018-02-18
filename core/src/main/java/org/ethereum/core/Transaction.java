@@ -359,11 +359,9 @@ public class Transaction {
         return HashUtil.calcNewAddr(this.getSender(), this.getNonce());
     }
 
-    @Deprecated
     public boolean isContractCreation() {
-        return false;
-        /*rlpParse();
-        return this.receiveAddress == null || Arrays.equals(this.receiveAddress, ByteUtil.EMPTY_BYTE_ARRAY);*/
+        rlpParse();
+        return this.receiveAddress == null || Arrays.equals(this.receiveAddress, ByteUtil.EMPTY_BYTE_ARRAY);
     }
 
     /*
@@ -423,7 +421,7 @@ public class Transaction {
         return "TransactionData [" + "hash=" + ByteUtil.toHexString(hash) +
                 "  nonce=" + ByteUtil.toHexString(nonce) +
                 ", gasPrice=" + ByteUtil.toHexString(gasPrice) +
-                ", gasLimit=" + ByteUtil.toHexString(gasLimit) +
+                ", gas=" + ByteUtil.toHexString(gasLimit) +
                 ", receiveAddress=" + ByteUtil.toHexString(receiveAddress) +
                 ", sendAddress=" + ByteUtil.toHexString(getSender()) +
                 ", value=" + ByteUtil.toHexString(value) +

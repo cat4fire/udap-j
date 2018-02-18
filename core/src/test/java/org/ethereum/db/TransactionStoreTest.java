@@ -131,6 +131,6 @@ public class TransactionStoreTest {
         txDb1.put(tx.getHash(), info.getEncoded()); // legacy serialization
         TransactionStore transactionStore1 = new TransactionStore(txDb1);
         TransactionInfo info1 = transactionStore1.get(tx.getHash()).get(0);
-        Assert.assertArrayEquals(info1.getReceipt().getTxState(), info.getReceipt().getTxState());
+        Assert.assertArrayEquals(info1.getReceipt().getPostTxState(), info.getReceipt().getPostTxState());
     }
 }

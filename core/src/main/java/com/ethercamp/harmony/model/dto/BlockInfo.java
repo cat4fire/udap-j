@@ -35,4 +35,6 @@ public class BlockInfo {
     private final String parentHash;
 
     private final long difficulty;
+
+    private final boolean hasTransaction;
 }
