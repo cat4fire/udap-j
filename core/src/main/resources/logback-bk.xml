@@ -18,9 +18,9 @@
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
         </encoder>
-        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
-        </filter>-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -35,9 +35,9 @@
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %p [%c{1}] %m%n</pattern>
         </encoder>
-        <!--<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
-        </filter>-->
+        </filter>
     </appender>
 
     <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
@@ -53,8 +53,7 @@
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
-        <!--<appender-ref ref="ASYNC"/>-->
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="ASYNC"/>
     </root>
 
 
@@ -92,7 +91,6 @@
     <logger level="DEBUG" name="jsonrpc"/>
     <logger level="INFO" name="org.springframework.web.servlet.DispatcherServlet"/>
     <logger level="DEBUG" name="com.ethercamp.harmony"/>
-    <logger level="DEBUG" name="api"/>
 
     <!-- Contract data -->
     <logger level="INFO" name="web-profiler"/>

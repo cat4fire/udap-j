@@ -36,7 +36,7 @@ import org.ethereum.util.ByteUtil;
 import org.ethereum.validator.DependentBlockHeaderRuleAdapter;
 import org.ethereum.vm.DataWord;
 import org.ethereum.vm.LogInfo;
-import org.ethereum.vm.VM;
+//import org.ethereum.vm.VM;
 import org.ethereum.vm.program.Program;
 import org.ethereum.vm.program.invoke.ProgramInvoke;
 import org.ethereum.vm.program.invoke.ProgramInvokeFactoryImpl;
@@ -55,7 +55,7 @@ import java.util.Map;
 
 import static org.ethereum.crypto.HashUtil.shortHash;
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
+//import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
 
 /**
  * @author Roman Mandeleil
@@ -176,7 +176,7 @@ public class TestRunner {
 
 
     public List<String> runTestCase(TestCase testCase) {
-
+/*
         logger.info("\n***");
         logger.info(" Running test case: [" + testCase.getName() + "]");
         logger.info("***\n");
@@ -191,7 +191,7 @@ public class TestRunner {
         try {
 
 
-            /* 2. Create ProgramInvoke - Env/Exec */
+             2. Create ProgramInvoke - Env/Exec
             Env env = testCase.getEnv();
             Exec exec = testCase.getExec();
             Logs logs = testCase.getLogs();
@@ -221,8 +221,8 @@ public class TestRunner {
                     gasPrice, gas, callValue, msgData, lastHash, coinbase,
                     timestamp, number, difficulty, gaslimit, repository, new BlockStoreDummy(), true);
 
-            /* 3. Create Program - exec.code */
-            /* 4. run VM */
+            // 3. Create Program - exec.code
+            // 4. run VM
             VM vm = new VM();
             Program program = new Program(exec.getCode(), programInvoke);
             boolean vmDidThrowAnEception = false;
@@ -258,7 +258,7 @@ public class TestRunner {
 
                 logger.info("--------- POST --------");
 
-                /* 5. Assert Post values */
+                 5. Assert Post values
                 if (testCase.getPost() != null) {
                     for (ByteArrayWrapper key : testCase.getPost().keySet()) {
 
@@ -350,7 +350,7 @@ public class TestRunner {
                             }
                         }
 
-                    /* asset logs */
+                     asset logs
                         List<LogInfo> logResult = program.getResult().getLogInfoList();
 
                         List<String> logResults = logs.compareToReal(logResult);
@@ -470,15 +470,16 @@ public class TestRunner {
                     logger.info(output);
                     results.add(output);
                 }
-                /*
+
                  * end of if(testCase.getPost().size() == 0)
-                 */
+
             }
 
             return results;
         } finally {
 //          repository.close();
-        }
+        }*/
+        return new ArrayList<>();
     }
 
     public org.ethereum.core.Transaction createTransaction(Transaction tx) {

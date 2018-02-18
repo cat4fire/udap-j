@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  * @author Roman Mandeleil
  * @since 16.06.2014
  */
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+/*@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class VMComplexTest {
 
     private static Logger logger = LoggerFactory.getLogger("TCK-Test");
@@ -50,7 +50,7 @@ public class VMComplexTest {
     @Test // contract call recursive
     public void test1() {
 
-        /**
+        *//**
          *       #The code will run
          *       ------------------
 
@@ -62,7 +62,7 @@ public class VMComplexTest {
          send((tx.gas / 10 * 8), 0x77045e71a7a2c50903d88e564cd72fab11e82051, 0)
          else:
          stop
-         */
+ *//*
 
         int expectedGas = 436;
 
@@ -123,7 +123,7 @@ public class VMComplexTest {
     @Test // contractB call contractA with data to storage
     public void test2() {
 
-        /**
+        *//**
          *       #The code will run
          *       ------------------
 
@@ -140,7 +140,7 @@ public class VMComplexTest {
          -----------
          a = msg((tx.gas / 10 * 8), 0x77045e71a7a2c50903d88e564cd72fab11e82051, 0, [11, 22, 33], 3, 6)
 
-         */
+ *//*
 
         long expectedVal_1 = 11;
         long expectedVal_2 = 22;
@@ -212,7 +212,7 @@ public class VMComplexTest {
     @Test // contractB call contractA with return expectation
     public void test3() {
 
-        /**
+        *//**
          *       #The code will run
          *       ------------------
 
@@ -234,7 +234,7 @@ public class VMComplexTest {
          -----------
          a = msg((tx.gas / 10 * 8), 0x77045e71a7a2c50903d88e564cd72fab11e82051, 0, [11, 22, 33], 3, 6)
 
-         */
+ *//*
 
         long expectedVal_1 = 11;
         long expectedVal_2 = 22;
@@ -303,7 +303,7 @@ public class VMComplexTest {
     @Test // CREATE magic
     public void test4() {
 
-        /**
+        *//**
          *       #The code will run
          *       ------------------
 
@@ -320,7 +320,7 @@ public class VMComplexTest {
          a = 200
          b = 300
 
-         */
+ *//*
 
         // Set contract into Database
         byte[] caller_addr_bytes = Hex.decode("cd2a3d9f938e13cd947ec05abc7fe734df8dd826");
@@ -371,7 +371,7 @@ public class VMComplexTest {
     @Ignore
     @Test // contractB call itself with code from contractA
     public void test6() {
-        /**
+        *//**
          *       #The code will run
          *       ------------------
 
@@ -387,7 +387,7 @@ public class VMComplexTest {
          (MSTORE 32 0xaaffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffaa)
          [[ 0 ]] (CALLSTATELESS 1000000 0x945304eb96065b2a98b57a48a06ae28d285a71b5 23 0 64 64 0)
          }
-         */
+ *//*
 
         // Set contract into Database
         byte[] caller_addr_bytes = Hex.decode("cd1722f3947def4cf144679da39c4c32bdc35681");
@@ -445,4 +445,4 @@ public class VMComplexTest {
 
         // TODO: check that the value pushed after exec is 1
     }
-}
+}*/

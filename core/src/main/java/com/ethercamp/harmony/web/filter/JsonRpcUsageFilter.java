@@ -114,6 +114,7 @@ public class JsonRpcUsageFilter implements Filter {
                 } catch (IOException e) {
                     log.error("Error parsing JSON-RPC request", e);
                 }
+
             } else {
                 chain.doFilter(request, response);
             }

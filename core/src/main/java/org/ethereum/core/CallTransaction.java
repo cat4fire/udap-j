@@ -141,6 +141,39 @@ public class CallTransaction {
             return ByteUtil.merge(bb);
         }
 
+        public byte[] encodeResult(Object... args) {
+            if (args.length > outputs.length)
+                throw new RuntimeException("Too many arguments: " + args.length + " > " + outputs.length);
+
+            int staticSize = 0;
+            int dynamicCnt = 0;
+            // calculating static size and number of dynamic params
+            for (int i = 0; i < args.length; i++) {
+                Param param = outputs[i];
+                if (param.type.isDynamicType()) {
+                    dynamicCnt++;
+                }
+                staticSize += param.type.getFixedSize();
+            }
+
+            byte[][] bb = new byte[args.length + dynamicCnt][];
+
+            int curDynamicPtr = staticSize;
+            int curDynamicCnt = 0;
+            for (int i = 0; i < args.length; i++) {
+                if (outputs[i].type.isDynamicType()) {
+                    byte[] dynBB = outputs[i].type.encode(args[i]);
+                    bb[i] = SolidityType.IntType.encodeInt(curDynamicPtr);
+                    bb[args.length + curDynamicCnt] = dynBB;
+                    curDynamicCnt++;
+                    curDynamicPtr += dynBB.length;
+                } else {
+                    bb[i] = outputs[i].type.encode(args[i]);
+                }
+            }
+            return ByteUtil.merge(bb);
+        }
+
         private Object[] decode(byte[] encoded, Param[] params) {
             Object[] ret = new Object[params.length];
 
@@ -156,8 +189,8 @@ public class CallTransaction {
             return ret;
         }
 
-        public Object[] decode(byte[] encoded) {
-            return decode(subarray(encoded, 4, encoded.length), inputs);
+        public Object[] decodeParam(byte[] encodedCalldata) {
+            return decode(subarray(encodedCalldata, 4, encodedCalldata.length), inputs);
         }
 
         public Object[] decodeResult(byte[] encodedRet) {
@@ -276,7 +309,7 @@ public class CallTransaction {
             if (data.length < 4) throw new RuntimeException("Invalid data length: " + data.length);
             Function function = getBySignatureHash(Arrays.copyOfRange(data, 0, 4));
             if (function == null) throw new RuntimeException("Can't find function/event by it signature");
-            Object[] args = function.decode(data);
+            Object[] args = function.decodeParam(data);
             return new Invocation(this, function, args);
         }
 

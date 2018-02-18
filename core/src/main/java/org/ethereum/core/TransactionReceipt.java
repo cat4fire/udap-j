@@ -44,6 +44,7 @@ public class TransactionReceipt {
     private byte[] cumulativeGas = EMPTY_BYTE_ARRAY;
     private Bloom bloomFilter = new Bloom();
     private List<LogInfo> logInfoList = new ArrayList<>();
+    //private byte[] hReturn = EMPTY_BYTE_ARRAY; here it's called executionResult below
 
     private byte[] gasUsed = EMPTY_BYTE_ARRAY;
     private byte[] executionResult = EMPTY_BYTE_ARRAY;
@@ -265,6 +266,7 @@ public class TransactionReceipt {
             throw new NullPointerException("Transaction is not initialized. Use TransactionInfo and BlockStore to setup Transaction instance");
         return transaction;
     }
+
 
     @Override
     public String toString() {

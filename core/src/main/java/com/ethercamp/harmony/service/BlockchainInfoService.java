@@ -27,7 +27,7 @@ import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 import com.ethercamp.harmony.keystore.FileSystemKeystore;
 import org.ethereum.util.BuildInfo;
-import org.ethereum.vm.VM;
+//import org.ethereum.vm.VM;
 import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Logger;
 import com.ethercamp.harmony.model.dto.*;
@@ -69,6 +69,8 @@ import static java.util.stream.Collectors.*;
 @Service
 @Slf4j(topic = "harmony")
 public class BlockchainInfoService implements ApplicationListener {
+
+    //private static final org.slf4j.Logger logger = LoggerFactory.getLogger("wallet");
 
     public static final int KEEP_LOG_ENTRIES = 1000;
     private static final int BLOCK_COUNT_FOR_HASH_RATE = 100;
@@ -215,7 +217,7 @@ public class BlockchainInfoService implements ApplicationListener {
 
             final boolean isContractsFeatureEnabled = env.getProperty("feature.contract.enabled", "false").equalsIgnoreCase("true");
             if (!isContractsFeatureEnabled) {
-                VM.setVmHook(null);
+                //VM.setVmHook(null);
                 log.info("Disabled VM hook due to contracts feature disabled");
             }
 
@@ -237,13 +239,14 @@ public class BlockchainInfoService implements ApplicationListener {
 
             final String ANSI_RESET = "\u001B[0m";
             final String ANSI_BLUE = "\u001B[34m";
-            System.out.println("EthereumJ database dir location: " + systemProperties.databaseDir());
-            System.out.println("EthereumJ keystore dir location: " + keystore.getKeyStoreLocation());
-            System.out.println(ANSI_BLUE + "Server started at http://localhost:" + serverPort + "" + ANSI_RESET);
+            log.info("EthereumJ database dir location: " + systemProperties.databaseDir());
+            log.info("EthereumJ keystore dir location: " + keystore.getKeyStoreLocation());
+            log.info(ANSI_BLUE + "Server started at http://localhost:" + serverPort + "" + ANSI_RESET);
 
             if (!config.getConfig().hasPath("logs.keepStdOut") || !config.getConfig().getBoolean("logs.keepStdOut")) {
                 createLogAppenderForMessaging();
             }
+
         }
     }
 
@@ -401,7 +404,7 @@ public class BlockchainInfoService implements ApplicationListener {
         };
 
         final Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        Optional.ofNullable(root.getAppender("STDOUT"))
+        /*Optional.ofNullable(root.getAppender("STDOUT"))
                 .ifPresent(stdout -> {
                     stdout.stop();
                     stdout.clearAllFilters();
@@ -411,11 +414,12 @@ public class BlockchainInfoService implements ApplicationListener {
                     stdout.addFilter(filter);
                     filter.start();
                     stdout.start();
-                });
+                });*/
 
 
         final ThresholdFilter filter = new ThresholdFilter();
-        filter.setLevel(Level.INFO.toString());
+        //filter.setLevel(Level.INFO.toString());
+        filter.setLevel(Level.ALL.toString());
         messagingAppender.addFilter(filter); // No effect of this
         messagingAppender.setName("ClientMessagingAppender");
         messagingAppender.setContext(context);

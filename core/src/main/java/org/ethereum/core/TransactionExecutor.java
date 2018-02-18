@@ -46,8 +46,8 @@ import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import static org.ethereum.util.BIUtil.*;
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
 import static org.ethereum.util.ByteUtil.toHexString;
-import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
-import static org.ethereum.vm.VMUtils.zipAndEncode;
+/*import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
+import static org.ethereum.vm.VMUtils.zipAndEncode;*/
 
 /**
  * @author Roman Mandeleil
@@ -79,7 +79,7 @@ public class TransactionExecutor {
 
     private final EthereumListener listener;
 
-    private VM vm;
+    //private VM vm;
     private Program program;
 
     PrecompiledContracts.PrecompiledContract precompiledContract;
@@ -135,18 +135,6 @@ public class TransactionExecutor {
     public void init() {
         basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
 
-        //lycrus
-        byte[] lycrusAddress = null;
-
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
-
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            readyToExecute = true;
-            //here we ignore nonce check
-            return;
-        }
-        //lycrus
-
         if (localCall) {
             readyToExecute = true;
             return;
@@ -170,18 +158,17 @@ public class TransactionExecutor {
             return;
         }
 
-        BigInteger reqNonce = track.getNonce(tx.getSender());
+/*        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
         BigInteger txNonce = toBI(tx.getNonce());
         if (isNotEqual(reqNonce, txNonce)) {
             execError(String.format("Invalid nonce: required: %s , tx.nonce: %s", reqNonce, txNonce));
 
             return;
-        }
+        }*/
 
         BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
         BigInteger totalCost = toBI(tx.getValue()).add(txGasCost);
         BigInteger senderBalance = track.getBalance(tx.getSender());
-//senderBalance = senderBalance.add(new BigInteger("15000000000000000000"))
         if (!isCovers(senderBalance, totalCost)) {
 
             execError(String.format("Not enough cash: Require: %s, Sender cash: %s", totalCost, senderBalance));
@@ -201,26 +188,42 @@ public class TransactionExecutor {
 
 
         //lycrus
-        byte[] lycrusAddress = null;
+        if (!readyToExecute) return;
+        //byte[] lycrusAddress = null;
 
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
+        //lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
 
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            byte[] targetAddress = tx.getReceiveAddress();
+        //if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
+        if (!localCall) {
+            //        track.increaseNonce(tx.getSender());
+
+            BigInteger txGasLimit = toBI(tx.getGasLimit());
+            BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
+            track.addBalance(tx.getSender(), txGasCost.negate());
+
+            if (logger.isInfoEnabled())
+                logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
+        }
             ProgramInvoke programInvoke =
                     programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 //cacheTrack -> track
-            this.vm = new VM(config);
-            byte[] code = track.getCode(targetAddress);
-            this.program = new Program(track.getCodeHash(targetAddress), code, programInvoke, tx, config).withCommonConfig(commonConfig);
+            //this.vm = new VM(config);
+        //byte[] code = track.getCode(targetAddress);
+            this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
+
+        BigInteger endowment = toBI(tx.getValue());
+
+        byte[] targetAddress = tx.getReceiveAddress();
+        transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
+        touchedAccounts.add(targetAddress);
+
+
             return;
-        }
+        // }
         //lycrus
 
-        if (!readyToExecute) return;
-
-        if (!localCall) {
-            track.increaseNonce(tx.getSender());
+        /*if (!localCall) {
+            //        track.increaseNonce(tx.getSender());
 
             BigInteger txGasLimit = toBI(tx.getGasLimit());
             BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
@@ -230,18 +233,19 @@ public class TransactionExecutor {
                 logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
         }
 
-        if (tx.isContractCreation()) {
+
+        *//*if (tx.isContractCreation()) {
             create();
-        } else {
+        } else {*//*
             call();
-        }
+        *//*}*/
     }
 
     private void call() {
         if (!readyToExecute) return;
 
         byte[] targetAddress = tx.getReceiveAddress();
-        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
+/*        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
 
         if (precompiledContract != null) {
             long requiredGas = precompiledContract.getGasForData(tx.getData());
@@ -269,20 +273,20 @@ public class TransactionExecutor {
                 }
             }
 
-        } else {
+        } else {*/
 
-            byte[] code = track.getCode(targetAddress);
+            /*byte[] code = track.getCode(targetAddress);
             if (isEmpty(code)) {
                 m_endGas = m_endGas.subtract(BigInteger.valueOf(basicTxCost));
                 result.spendGas(basicTxCost);
-            } else {
+            } else {*/
                 ProgramInvoke programInvoke =
                         programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 
-                this.vm = new VM(config);
-                this.program = new Program(track.getCodeHash(targetAddress), code, programInvoke, tx, config).withCommonConfig(commonConfig);
-            }
-        }
+        //this.vm = new VM(config);
+        this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
+            /*}*/
+        /*}*/
 
         BigInteger endowment = toBI(tx.getValue());
         transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
@@ -290,7 +294,7 @@ public class TransactionExecutor {
         touchedAccounts.add(targetAddress);
     }
 
-    private void create() {
+    /*private void create() {
         byte[] newContractAddress = tx.getContractAddress();
 
         AccountState existingAddr = cacheTrack.getAccountState(newContractAddress);
@@ -330,13 +334,13 @@ public class TransactionExecutor {
         transfer(cacheTrack, tx.getSender(), newContractAddress, endowment);
 
         touchedAccounts.add(newContractAddress);
-    }
+    }*/
 
     public void go() {
         if (!readyToExecute) return;
 
         //lycrus
-        byte[] lycrusAddress = null;
+/*        byte[] lycrusAddress = null;
 
         lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
         if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
@@ -363,10 +367,40 @@ public class TransactionExecutor {
             touchedAccounts.add(lycrusAddress);
             cacheTrack.commit();
             return;
+        }*/
+
+        if (program == null) return;
+        try {
+            program.run();
+            result = program.getResult();
+            m_endGas = toBI(tx.getGasLimit()).subtract(toBI(program.getResult().getGasUsed()));
+
+            if (result.getException() != null || result.isRevert()) {
+                result.getDeleteAccounts().clear();
+                result.getLogInfoList().clear();
+                result.resetFutureRefund();
+                rollback();
+
+                if (result.getException() != null) {
+                    throw result.getException();
+                } else {
+                    execError("REVERT opcode executed");
+                }
+            } else {
+                touchedAccounts.addAll(result.getTouchedAccounts());
+                cacheTrack.commit();
+            }
+        } catch (Throwable e) {
+
+            // TODO: catch whatever they will throw on you !!!
+//            https://github.com/ethereum/cpp-ethereum/blob/develop/libethereum/Executive.cpp#L241
+            rollback();
+            m_endGas = BigInteger.ZERO;
+            execError(e.getMessage());
         }
-
-
+        return;
         //lycrus
+/*
 
         try {
 
@@ -439,7 +473,8 @@ public class TransactionExecutor {
             rollback();
             m_endGas = BigInteger.ZERO;
             execError(e.getMessage());
-        }
+        }*/
+
     }
 
     private void rollback() {
@@ -454,12 +489,12 @@ public class TransactionExecutor {
     public TransactionExecutionSummary finalization() {
 
         //lycrus
-        byte[] lycrusAddress = null;
+        /*byte[] lycrusAddress = null;
 
         lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
         if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
             m_endGas = BigInteger.valueOf(100000l - 50l);
-        }
+        }*/
 
 
         //lycrus
@@ -484,7 +519,7 @@ public class TransactionExecutor {
                     .gasUsed(toBI(result.getGasUsed()))
                     .gasRefund(toBI(gasRefund))
                     .deletedAccounts(result.getDeleteAccounts())
-                    .internalTransactions(result.getInternalTransactions());
+                    /*.internalTransactions(result.getInternalTransactions())*/;
 
             ContractDetails contractDetails = track.getContractDetails(addr);
             if (contractDetails != null) {
@@ -532,7 +567,7 @@ public class TransactionExecutor {
 
         listener.onTransactionExecuted(summary);
 
-        if (config.vmTrace() && program != null && result != null) {
+        /*if (config.vmTrace() && program != null && result != null) {
             String trace = program.getTrace()
                     .result(result.getHReturn())
                     .error(result.getException())
@@ -546,7 +581,7 @@ public class TransactionExecutor {
             String txHash = toHexString(tx.getHash());
             saveProgramTraceFile(config, txHash, trace);
             listener.onVMTraceCreated(txHash, trace);
-        }
+        }*/
         return summary;
     }
 
@@ -566,7 +601,8 @@ public class TransactionExecutor {
             receipt.setGasUsed(getGasUsed());
             receipt.setExecutionResult(getResult().getHReturn());
             receipt.setError(execError);
-//            receipt.setPostTxState(track.getRoot()); // TODO later when RepositoryTrack.getRoot() is implemented
+            receipt.setTxStatus(receipt.isSuccessful());
+//            receipt.setTxState(track.getRoot()); // TODO later when RepositoryTrack.getRoot() is implemented
         }
         return receipt;
     }

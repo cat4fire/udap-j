@@ -18,10 +18,10 @@
 
 package com.ethercamp.harmony.web.controller;
 
-import com.ethercamp.contrdata.storage.StorageEntry;
+//import com.ethercamp.contrdata.storage.StorageEntry;
 import com.ethercamp.harmony.model.dto.ActionStatus;
 import com.ethercamp.harmony.model.dto.ContractObjects.*;
-import com.ethercamp.harmony.service.ContractsService;
+//import com.ethercamp.harmony.service.ContractsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,20 +38,20 @@ import static org.apache.commons.lang3.StringUtils.lowerCase;
 /**
  * Created by Stan Reshetnyk on 18.10.16.
  */
-@Slf4j
+/*@Slf4j
 @RestController
 public class ContractsController {
 
     @Autowired
     ContractsService contractsService;
 
-    @RequestMapping("/contracts/{address}/storage")
+    *//*@RequestMapping("/contracts/{address}/storage")
     public Page<StorageEntry> getContractStorage(@PathVariable String address,
                                                  @RequestParam(required = false) String path,
                                                  @RequestParam(required = false, defaultValue = "0") int page,
                                                  @RequestParam(required = false, defaultValue = "5") int size) {
         return contractsService.getContractStorage(address, path, new PageRequest(page, size));
-    }
+    }*//*
 
     @RequestMapping(value = "/contracts/add", method = RequestMethod.POST)
     public ActionStatus<ContractInfoDTO> addContractSources(@RequestBody WatchContractDTO watchContract) {
@@ -129,4 +129,4 @@ public class ContractsController {
         public String sourceCode;
 
     }
-}
+}*/
