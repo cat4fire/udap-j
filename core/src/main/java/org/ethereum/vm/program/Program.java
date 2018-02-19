@@ -73,7 +73,7 @@ public class Program {
     private ProgramStorageChangeListener storageDiffListener = new ProgramStorageChangeListener();
     private CompositeProgramListener programListener = new CompositeProgramListener();
 
-    private Storage storage;
+    //private Storage storage;
     private byte[] returnDataBuffer;
 
     private ProgramResult result = new ProgramResult();
@@ -92,7 +92,7 @@ public class Program {
         this.invoke = programInvoke;
         this.transaction = transaction;
         traceListener = new ProgramTraceListener(config.vmTrace());
-        this.storage = setupProgramListener(new Storage(programInvoke));
+        //this.storage = setupProgramListener(new Storage(programInvoke));
         //this.trace = new ProgramTrace(config, programInvoke);
         this.blockchainConfig = config.getBlockchainConfig().getConfigForBlock(programInvoke.getNumber().longValue());
     }
@@ -103,9 +103,9 @@ public class Program {
         return this;
     }
 
-    public int getCallDeep() {
+    /*public int getCallDeep() {
         return invoke.getCallDeep();
-    }
+    }*/
 
     /*private InternalTransaction addInternalTx(byte[] nonce, DataWord gasLimit, byte[] senderAddress, byte[] receiveAddress,
                                               BigInteger value, byte[] data, String note) {
@@ -313,7 +313,7 @@ public class Program {
      */
 
 
-    public void suicide(DataWord obtainerAddress) {
+    /*public void suicide(DataWord obtainerAddress) {
 
         byte[] owner = getOwnerAddress().getLast20Bytes();
         byte[] obtainer = obtainerAddress.getLast20Bytes();
@@ -334,11 +334,11 @@ public class Program {
         }
 
         getResult().addDeleteAccount(this.getOwnerAddress());
-    }
+    }*/
 
-    public Repository getStorage() {
+    /*public Repository getStorage() {
         return this.storage;
-    }
+    }*/
 
     /*@SuppressWarnings("ThrowableResultOfMethodCallIgnored")
     public void createContract(DataWord value, DataWord memStart, DataWord memSize) {
@@ -640,27 +640,35 @@ public class Program {
         getResult().resetFutureRefund();
     }
 
-    public void storageSave(DataWord word1, DataWord word2) {
+    /*public void storageSave(DataWord word1, DataWord word2) {
         storageSave(word1.getData(), word2.getData());
-    }
+    }*/
 
-    public void storageSave(DataWord accountAddress, DataWord word1, DataWord word2) {
+    /*public void storageSave(DataWord accountAddress, BigInteger accountType, DataWord word1, DataWord word2) {
         byte[] addr = accountAddress.getLast20Bytes();
-        getStorage().addStorageRow(addr, word1, word2);
+        getStorage().addStorageRow(addr, accountType, word1, word2);
         result.addTouchAccount(accountAddress.getLast20Bytes());
-    }
+    }*/
 
-    public void storageSave(byte[] key, byte[] val) {
+    /*public void storageSave(byte[] key, byte[] val) {
         DataWord keyWord = new DataWord(key);
         DataWord valWord = new DataWord(val);
-        getStorage().addStorageRow(getOwnerAddress().getLast20Bytes(), keyWord, valWord);
+        getStorage().addStorageRow(getOwnerAddress().getLast20Bytes(), accountType, keyWord, valWord);
+    }*/
+
+    public void stateSave(DataWord accountAddress, BigInteger accountType, DataWord word1, DataWord word2) {
+        invoke.getRepository().addStorageRow(accountAddress.getLast20Bytes(), accountType, word1, word2);
     }
 
-    public void createAccount(byte[] addr, BigInteger accountType) {
+    /*public void createAccount(byte[] addr, BigInteger accountType) {
         getStorage().createAccount(addr, accountType);
         return;
-    }
+    }*/
 
+    public void createAccount(byte[] addr, BigInteger accountType) {
+        invoke.getRepository().createAccount(addr, accountType);
+        return;
+    }
 
     /*public byte[] getCode() {
         return ops;
@@ -671,9 +679,9 @@ public class Program {
         return nullToEmpty(code);
     }*/
 
-    public DataWord getOwnerAddress() {
+    /*public DataWord getOwnerAddress() {
         return invoke.getOwnerAddress().clone();
-    }
+    }*/
 
     public DataWord getBlockHash(int index) {
         return index < this.getNumber().longValue() && index >= Math.max(256, this.getNumber().intValue()) - 256 ?
@@ -681,18 +689,18 @@ public class Program {
                 DataWord.ZERO.clone();
     }
 
-    public DataWord getBalance(DataWord address) {
+    /*public DataWord getBalance(DataWord address) {
         BigInteger balance = getStorage().getBalance(address.getLast20Bytes());
         return new DataWord(balance.toByteArray());
-    }
+    }*/
 
     public DataWord getOriginAddress() {
         return invoke.getOriginAddress().clone();
     }
 
-    public DataWord getCallerAddress() {
+    /*public DataWord getCallerAddress() {
         return invoke.getCallerAddress().clone();
-    }
+    }*/
 
     public DataWord getGasPrice() {
         return invoke.getMinGasPrice().clone();
@@ -736,16 +744,16 @@ public class Program {
                 Arrays.copyOfRange(returnDataBuffer, off.intValueSafe(), off.intValueSafe() + size.intValueSafe());
     }
 
-    public DataWord storageLoad(DataWord key) {
+    /*public DataWord storageLoad(DataWord key) {
         DataWord ret = getStorage().getStorageValue(getOwnerAddress().getLast20Bytes(), key.clone());
         return ret == null ? null : ret.clone();
-    }
+    }*/
 
-    public DataWord storageLoad(DataWord accountAddress, DataWord key) {
+    /*public DataWord storageLoad(DataWord accountAddress, DataWord key) {
         byte[] addr = accountAddress.getLast20Bytes();
         DataWord ret = getStorage().getStorageValue(addr, key.clone());
         return ret == null ? null : ret.clone();
-    }
+    }*/
 
     public DataWord getPrevHash() {
         return invoke.getPrevHash().clone();
@@ -775,9 +783,9 @@ public class Program {
         return invoke.getGaslimit().clone();
     }
 
-    public boolean isStaticCall() {
+    /*public boolean isStaticCall() {
         return invoke.isStaticCall();
-    }
+    }*/
 
     public ProgramResult getResult() {
         return result;
@@ -803,8 +811,8 @@ public class Program {
 
             if (stackData.length() > 0) stackData.insert(0, "\n");
 
-            ContractDetails contractDetails = getStorage().
-                    getContractDetails(getOwnerAddress().getLast20Bytes());
+            StateDetails contractDetails = getStorage().
+                    getStateDetails(getOwnerAddress().getLast20Bytes());
             StringBuilder storageData = new StringBuilder();
             if (contractDetails != null) {
                 List<DataWord> storageKeys = new ArrayList<>(contractDetails.getStorage().keySet());
@@ -1159,9 +1167,9 @@ public class Program {
         }
     }*/
 
-    public boolean byTestingSuite() {
+    /*public boolean byTestingSuite() {
         return invoke.byTestingSuite();
-    }
+    }*/
 
     /*public interface ProgramOutListener {
         void output(String out);

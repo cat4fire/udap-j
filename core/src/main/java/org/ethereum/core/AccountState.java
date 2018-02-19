@@ -69,12 +69,14 @@ public class AccountState {
 
 
     /**
+     * Any = 0 //this is an option like wildcard for RUD but not suitable for C
      * External = 1
      * AssetProto = 2
      * Asset = 3
      */
     private final BigInteger accountType;
 
+    public static BigInteger ACCOUNT_TYPE_ANY = BigInteger.valueOf(1);
     public static BigInteger ACCOUNT_TYPE_EXTERNAL = BigInteger.valueOf(1);
     public static BigInteger ACCOUNT_TYPE_ASSET_PROTO = BigInteger.valueOf(2);
     public static BigInteger ACCOUNT_TYPE_ASSET = BigInteger.valueOf(3);
@@ -189,7 +191,8 @@ public class AccountState {
     public String toString() {
         String ret = "  Nonce: " + this.getNonce().toString() + "\n" +
                 "  Balance: " + getBalance() + "\n" +
-                "  State Root: " + Hex.toHexString(this.getStateRoot()) + "\n" /*+
+                "  State Root: " + Hex.toHexString(this.getStateRoot()) + "\n" +
+                "  Account Type: " + this.getAccountType() + "\n" /*+
                 "  Code Hash: " + Hex.toHexString(this.getCodeHash())*/;
         return ret;
     }

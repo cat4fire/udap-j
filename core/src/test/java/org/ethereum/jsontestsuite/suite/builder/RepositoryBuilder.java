@@ -21,11 +21,11 @@ import org.ethereum.core.AccountState;
 import org.ethereum.core.Repository;
 import org.ethereum.datasource.inmem.HashMapDB;
 import org.ethereum.datasource.NoDeleteSource;
+import org.ethereum.db.StateDetails;
 import org.ethereum.jsontestsuite.suite.IterableTestRepository;
 import org.ethereum.db.RepositoryRoot;
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
-import org.ethereum.jsontestsuite.suite.ContractDetailsCacheImpl;
+import org.ethereum.jsontestsuite.suite.StateDetailsCacheImpl;
 import org.ethereum.jsontestsuite.suite.model.AccountTck;
 
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class RepositoryBuilder {
 
     public static Repository build(Map<String, AccountTck> accounts) {
         HashMap<ByteArrayWrapper, AccountState> stateBatch = new HashMap<>();
-        HashMap<ByteArrayWrapper, ContractDetails> detailsBatch = new HashMap<>();
+        HashMap<ByteArrayWrapper, StateDetails> detailsBatch = new HashMap<>();
 
         for (String address : accounts.keySet()) {
 
@@ -46,11 +46,11 @@ public class RepositoryBuilder {
             AccountBuilder.StateWrap stateWrap = AccountBuilder.build(accountTCK);
 
             AccountState state = stateWrap.getAccountState();
-            ContractDetails details = stateWrap.getContractDetails();
+            StateDetails details = stateWrap.getContractDetails();
 
             stateBatch.put(wrap(parseData(address)), state);
 
-            ContractDetailsCacheImpl detailsCache = new ContractDetailsCacheImpl(details);
+            StateDetailsCacheImpl detailsCache = new StateDetailsCacheImpl(details);
             detailsCache.setDirty(true);
 
             detailsBatch.put(wrap(parseData(address)), detailsCache);

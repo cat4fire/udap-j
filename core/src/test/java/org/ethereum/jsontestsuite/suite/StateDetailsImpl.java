@@ -22,7 +22,7 @@ import org.ethereum.config.SystemProperties;
 import org.ethereum.datasource.DbSource;
 import org.ethereum.datasource.Source;
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.trie.SecureTrie;
 import org.ethereum.util.*;
 import org.ethereum.vm.DataWord;
@@ -43,7 +43,7 @@ import static org.ethereum.util.ByteUtil.*;
  */
 @Component
 @Scope("prototype")
-public class ContractDetailsImpl extends AbstractContractDetails {
+public class StateDetailsImpl extends AbstractStateDetails {
     private static final Logger logger = LoggerFactory.getLogger("general");
 
     CommonConfig commonConfig = CommonConfig.getDefault();
@@ -63,10 +63,10 @@ public class ContractDetailsImpl extends AbstractContractDetails {
     /**
      * Tests only
      **/
-    public ContractDetailsImpl() {
+    public StateDetailsImpl() {
     }
 
-    private ContractDetailsImpl(byte[] address, SecureTrie storageTrie, Map<ByteArrayWrapper, byte[]> codes) {
+    private StateDetailsImpl(byte[] address, SecureTrie storageTrie, Map<ByteArrayWrapper, byte[]> codes) {
         this.address = address;
         this.storageTrie = storageTrie;
         setCodes(codes);
@@ -200,18 +200,18 @@ public class ContractDetailsImpl extends AbstractContractDetails {
     }
 
     @Override
-    public ContractDetails clone() {
+    public StateDetails clone() {
 
         // FIXME: clone is not working now !!!
         // FIXME: should be fixed
 
 //        storageTrie.getRoot();
 
-        return new ContractDetailsImpl(address, null, getCodes());
+        return new StateDetailsImpl(address, null, getCodes());
     }
 
     @Override
-    public ContractDetails getSnapshotTo(byte[] hash) {
+    public StateDetails getSnapshotTo(byte[] hash) {
 
         Source<byte[], byte[]> cache = this.storageTrie.getCache();
 
@@ -219,7 +219,7 @@ public class ContractDetailsImpl extends AbstractContractDetails {
                 new SecureTrie(cache, "".getBytes()) :
                 new SecureTrie(cache, hash);
 
-        ContractDetailsImpl details = new ContractDetailsImpl(this.address, snapStorage, getCodes());
+        StateDetailsImpl details = new StateDetailsImpl(this.address, snapStorage, getCodes());
         details.externalStorage = this.externalStorage;
         details.externalStorageDataSource = this.externalStorageDataSource;
         details.keys = this.keys;

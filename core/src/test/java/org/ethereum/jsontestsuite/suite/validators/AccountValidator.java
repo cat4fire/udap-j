@@ -18,7 +18,7 @@
 package org.ethereum.jsontestsuite.suite.validators;
 
 import org.ethereum.core.AccountState;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.vm.DataWord;
 import org.spongycastle.util.encoders.Hex;
 
@@ -28,8 +28,8 @@ import java.util.*;
 public class AccountValidator {
 
 
-    public static List<String> valid(String address, AccountState expectedState, ContractDetails expectedDetails,
-                                     AccountState currentState, ContractDetails currentDetails) {
+    public static List<String> valid(String address, AccountState expectedState, StateDetails expectedDetails,
+                                     AccountState currentState, StateDetails currentDetails) {
 
         List<String> results = new ArrayList<>();
 

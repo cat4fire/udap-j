@@ -27,13 +27,13 @@ import org.ethereum.vm.DataWord;
  */
 public interface ProgramInvoke {
 
-    DataWord getOwnerAddress();
+    //DataWord getOwnerAddress();
 
     DataWord getBalance();
 
     DataWord getOriginAddress();
 
-    DataWord getCallerAddress();
+    //DataWord getCallerAddress();
 
     DataWord getMinGasPrice();
 
@@ -61,15 +61,15 @@ public interface ProgramInvoke {
 
     DataWord getGaslimit();
 
-    boolean byTransaction();
+    //boolean byTransaction();
 
-    boolean byTestingSuite();
+    //boolean byTestingSuite();
 
-    int getCallDeep();
+    //int getCallDeep();
 
     Repository getRepository();
 
     BlockStore getBlockStore();
 
-    boolean isStaticCall();
+    //boolean isStaticCall();
 }

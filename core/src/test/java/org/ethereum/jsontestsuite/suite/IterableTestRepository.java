@@ -21,7 +21,7 @@ import org.ethereum.core.AccountState;
 import org.ethereum.core.Block;
 import org.ethereum.core.Repository;
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.util.ByteArrayMap;
 import org.ethereum.util.ByteArraySet;
 import org.ethereum.vm.DataWord;
@@ -116,13 +116,13 @@ public class IterableTestRepository implements Repository {
     }
 
     @Override
-    public ContractDetails getContractDetails(byte[] addr) {
-        return new IterableContractDetails(src.getContractDetails(addr));
+    public StateDetails getStateDetails(byte[] addr) {
+        return new IterableStateDetails(src.getStateDetails(addr));
     }
 
     @Override
-    public boolean hasContractDetails(byte[] addr) {
-        return src.hasContractDetails(addr);
+    public boolean hasStateDetails(byte[] addr) {
+        return src.hasStateDetails(addr);
     }
 
     @Override
@@ -230,13 +230,13 @@ public class IterableTestRepository implements Repository {
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, ContractDetails> contractDetailes) {
+    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, StateDetails> contractDetailes) {
         src.updateBatch(accountStates, contractDetailes);
         for (ByteArrayWrapper wrapper : accountStates.keySet()) {
             addAccount(wrapper.getData());
         }
 
-        for (Map.Entry<ByteArrayWrapper, ContractDetails> entry : contractDetailes.entrySet()) {
+        for (Map.Entry<ByteArrayWrapper, StateDetails> entry : contractDetailes.entrySet()) {
             for (DataWord key : entry.getValue().getStorageKeys()) {
                 addStorageKey(entry.getKey().getData(), key);
             }
@@ -249,7 +249,7 @@ public class IterableTestRepository implements Repository {
     }
 
     @Override
-    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, ContractDetails> cacheDetails) {
+    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, StateDetails> cacheDetails) {
         src.loadAccount(addr, cacheAccounts, cacheDetails);
     }
 
@@ -268,10 +268,10 @@ public class IterableTestRepository implements Repository {
         return src.getStorage(addr, keys);
     }
 
-    private class IterableContractDetails implements ContractDetails {
-        ContractDetails src;
+    private class IterableStateDetails implements StateDetails {
+        StateDetails src;
 
-        public IterableContractDetails(ContractDetails src) {
+        public IterableStateDetails(StateDetails src) {
             this.src = src;
         }
 
@@ -390,8 +390,8 @@ public class IterableTestRepository implements Repository {
         }
 
         @Override
-        public ContractDetails clone() {
-            return new IterableContractDetails(src.clone());
+        public StateDetails clone() {
+            return new IterableStateDetails(src.clone());
         }
 
         @Override
@@ -405,8 +405,8 @@ public class IterableTestRepository implements Repository {
         }
 
         @Override
-        public ContractDetails getSnapshotTo(byte[] hash) {
-            return new IterableContractDetails(src.getSnapshotTo(hash));
+        public StateDetails getSnapshotTo(byte[] hash) {
+            return new IterableStateDetails(src.getSnapshotTo(hash));
         }
     }
 }

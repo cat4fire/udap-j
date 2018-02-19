@@ -852,19 +852,19 @@ public class RepositoryTest {
         track2.addStorageRow(horse, horseKey1, horseVal0);
         Repository track3 = track2.startTracking();
 
-        ContractDetails cowDetails = track3.getContractDetails(cow);
+        StateDetails cowDetails = track3.getStateDetails(cow);
         cowDetails.put(cowKey1, cowVal1);
 
-        ContractDetails horseDetails = track3.getContractDetails(horse);
+        StateDetails horseDetails = track3.getStateDetails(horse);
         horseDetails.put(horseKey1, horseVal1);
 
         track3.commit();
         track2.rollback();
 
-        ContractDetails cowDetailsOrigin = repository.getContractDetails(cow);
+        StateDetails cowDetailsOrigin = repository.getStateDetails(cow);
         DataWord cowValOrin = cowDetailsOrigin.get(cowKey1);
 
-        ContractDetails horseDetailsOrigin = repository.getContractDetails(horse);
+        StateDetails horseDetailsOrigin = repository.getStateDetails(horse);
         DataWord horseValOrin = horseDetailsOrigin.get(horseKey1);
 
         assertEquals(cowVal0, cowValOrin);
@@ -910,8 +910,8 @@ public class RepositoryTest {
         byte[] root3 = repository.getRoot();
 
         Repository snapshot = new RepositoryRoot(stateDB, root);
-        ContractDetails cowDetails = snapshot.getContractDetails(cow);
-        ContractDetails horseDetails = snapshot.getContractDetails(horse);
+        StateDetails cowDetails = snapshot.getStateDetails(cow);
+        StateDetails horseDetails = snapshot.getStateDetails(horse);
         assertEquals(null, cowDetails.get(cowKey1));
         assertEquals(null, cowDetails.get(cowKey2));
         assertEquals(null, horseDetails.get(horseKey1));
@@ -919,16 +919,16 @@ public class RepositoryTest {
 
 
         snapshot = new RepositoryRoot(stateDB, root2);
-        cowDetails = snapshot.getContractDetails(cow);
-        horseDetails = snapshot.getContractDetails(horse);
+        cowDetails = snapshot.getStateDetails(cow);
+        horseDetails = snapshot.getStateDetails(horse);
         assertEquals(cowVal1, cowDetails.get(cowKey1));
         assertEquals(null, cowDetails.get(cowKey2));
         assertEquals(horseVal1, horseDetails.get(horseKey1));
         assertEquals(null, horseDetails.get(horseKey2));
 
         snapshot = new RepositoryRoot(stateDB, root3);
-        cowDetails = snapshot.getContractDetails(cow);
-        horseDetails = snapshot.getContractDetails(horse);
+        cowDetails = snapshot.getStateDetails(cow);
+        horseDetails = snapshot.getStateDetails(horse);
         assertEquals(cowVal1, cowDetails.get(cowKey1));
         assertEquals(cowVal0, cowDetails.get(cowKey2));
         assertEquals(horseVal1, horseDetails.get(horseKey1));
@@ -955,7 +955,7 @@ public class RepositoryTest {
         track2.commit();
         repository.flush();
 
-        ContractDetails cowDetails = repository.getContractDetails(cow);
+        StateDetails cowDetails = repository.getStateDetails(cow);
         assertEquals(cowVal0, cowDetails.get(cowKey2));
 
         final CountDownLatch failSema = new CountDownLatch(1);

@@ -18,7 +18,7 @@
 package org.ethereum.jsontestsuite.suite.validators;
 
 import org.ethereum.core.AccountState;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.core.Repository;
 import org.spongycastle.util.encoders.Hex;
 
@@ -54,10 +54,10 @@ public class RepositoryValidator {
         for (byte[] address : currentKeys) {
 
             AccountState state = currentRepository.getAccountState(address);
-            ContractDetails details = currentRepository.getContractDetails(address);
+            StateDetails details = currentRepository.getStateDetails(address);
 
             AccountState postState = postRepository.getAccountState(address);
-            ContractDetails postDetails = postRepository.getContractDetails(address);
+            StateDetails postDetails = postRepository.getStateDetails(address);
 
             List<String> accountResult =
                     AccountValidator.valid(Hex.toHexString(address), postState, postDetails, state, details);

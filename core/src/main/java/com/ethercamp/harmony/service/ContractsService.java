@@ -292,7 +292,7 @@ public class ContractsService {
                 .collect(toSet());
 
 
-        /*final String code = toHexString(ethereum.getRepository().getCode(Hex.decode(address)));
+        final String code = toHexString(ethereum.getRepository().getCode(Hex.decode(address)));
         final String asm = getAsm(code);
         if (isBlank(asm)) {
             throw validationError("Wrong account type: account with address '%s' hasn't any code.", address);
@@ -304,7 +304,7 @@ public class ContractsService {
             if (!funcHashes.contains(funcHash)) {
                 throw validationError("Incorrect code version: function with hash '%s' not found.", funcHash);
             }
-        });*/
+        });
         log.debug("Contract is valid " + contractName);
         return abi;
     }
@@ -373,10 +373,10 @@ public class ContractsService {
     private ContractInfoDTO compileAndSave(String hexAddress, List<String> files) {
         final byte[] address = Hex.decode(hexAddress);
 
-        /*final byte[] codeBytes = ethereum.getRepository().getCode(address);
+        final byte[] codeBytes = ethereum.getRepository().getCode(address);
         if (codeBytes == null || codeBytes.length == 0) {
             throw validationError("Account with address '%s' hasn't any code. Please ensure blockchain is fully synced.", hexAddress);
-        }*/
+        }
 
         // get list of contracts which match to deployed code
         final List<Validation<ContractException, ContractEntity>> validationResult = files.stream()

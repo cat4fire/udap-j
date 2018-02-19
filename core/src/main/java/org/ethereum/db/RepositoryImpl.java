@@ -21,16 +21,15 @@ import org.ethereum.config.SystemProperties;
 import org.ethereum.core.AccountState;
 import org.ethereum.core.Block;
 import org.ethereum.core.Repository;
-import org.ethereum.crypto.HashUtil;
 import org.ethereum.datasource.*;
-import org.ethereum.util.ByteUtil;
-import org.ethereum.util.FastByteComparisons;
 import org.ethereum.vm.DataWord;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.*;
+
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE_ANY;
 
 /**
  * Created by Anton Nashatyrev on 07.10.2016.
@@ -63,6 +62,9 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
 
     @Override
     public synchronized AccountState createAccount(byte[] addr, BigInteger accountType) {
+        if (accountType == ACCOUNT_TYPE_ANY) {
+            throw new RuntimeException("CODE0002");
+        }
         AccountState state = new AccountState(config.getBlockchainConfig().getCommonConstants().getInitialNonce(),
                 BigInteger.ZERO, accountType);
         accountStateCache.put(addr, state);
@@ -93,7 +95,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         storageCache.delete(addr);
     }
 
-    @Override
+    /*@Override
     public synchronized BigInteger increaseNonce(byte[] addr) {
         //AccountState accountState = getOrCreateAccountState(addr);//1
         AccountState accountState = accountStateCache.get(addr);
@@ -102,7 +104,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
         accountStateCache.put(addr, accountState.withIncrementedNonce());
         return accountState.getNonce();
-    }
+    }*/
 
     @Override
     public synchronized BigInteger increaseNonce(byte[] addr, BigInteger accountType) {
@@ -111,7 +113,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         return accountState.getNonce();
     }
 
-    @Override
+    /*@Override
     public synchronized BigInteger setNonce(byte[] addr, BigInteger nonce) {
         //AccountState accountState = getOrCreateAccountState(addr);//2
         AccountState accountState = accountStateCache.get(addr);
@@ -120,7 +122,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
         accountStateCache.put(addr, accountState.withNonce(nonce));
         return accountState.getNonce();
-    }
+    }*/
 
     @Override
     public synchronized BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce) {
@@ -137,13 +139,13 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
     }
 
     @Override
-    public synchronized ContractDetails getContractDetails(byte[] addr) {
-        return new ContractDetailsImpl(addr);
+    public synchronized StateDetails getStateDetails(byte[] addr) {
+        return new StateDetailsImpl(addr);
     }
 
     @Override
-    public synchronized boolean hasContractDetails(byte[] addr) {
-        return getContractDetails(addr) != null;
+    public synchronized boolean hasStateDetails(byte[] addr) {
+        return getStateDetails(addr) != null;
     }
 
     /*@Deprecated
@@ -168,7 +170,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         return accountState != null ? accountState.getCodeHash() : HashUtil.EMPTY_DATA_HASH;
     }*/
 
-    @Override
+    /*@Override
     public synchronized void addStorageRow(byte[] addr, DataWord key, DataWord value) {
         //getOrCreateAccountState(addr);//3
         AccountState accountState = accountStateCache.get(addr);
@@ -180,7 +182,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
         Source<DataWord, DataWord> contractStorage = storageCache.get(addr);
         contractStorage.put(key, value.isZero() ? null : value);
-    }
+    }*/
 
     @Override
     public synchronized void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value) {
@@ -201,7 +203,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         return accountState == null ? BigInteger.ZERO : accountState.getBalance();
     }
 
-    @Override
+    /*@Override
     public synchronized BigInteger addBalance(byte[] addr, BigInteger value) {
         //AccountState accountState = getOrCreateAccountState(addr);//4
         AccountState accountState = accountStateCache.get(addr);
@@ -210,7 +212,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
         accountStateCache.put(addr, accountState.withBalanceIncrement(value));
         return accountState.getBalance();
-    }
+    }*/
 
     @Override
     public synchronized BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value) {
@@ -272,16 +274,16 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         throw new RuntimeException("Not supported");
     }
 
-    class ContractDetailsImpl implements ContractDetails {
+    class StateDetailsImpl implements StateDetails {
         private byte[] address;
 
-        public ContractDetailsImpl(byte[] address) {
+        public StateDetailsImpl(byte[] address) {
             this.address = address;
         }
 
         @Override
         public void put(DataWord key, DataWord value) {
-            RepositoryImpl.this.addStorageRow(address, key, value);
+            throw new RuntimeException("Not supported");
         }
 
         @Override
@@ -383,7 +385,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
 
         @Override
-        public ContractDetails clone() {
+        public StateDetails clone() {
             throw new RuntimeException("Not supported");
         }
 
@@ -393,7 +395,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
         }
 
         @Override
-        public ContractDetails getSnapshotTo(byte[] hash) {
+        public StateDetails getSnapshotTo(byte[] hash) {
             throw new RuntimeException("Not supported");
         }
     }
@@ -455,12 +457,12 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, ContractDetails> contractDetailes) {
+    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, StateDetails> contractDetailes) {
         for (Map.Entry<ByteArrayWrapper, AccountState> entry : accountStates.entrySet()) {
             accountStateCache.put(entry.getKey().getData(), entry.getValue());
         }
-        for (Map.Entry<ByteArrayWrapper, ContractDetails> entry : contractDetailes.entrySet()) {
-            ContractDetails details = getContractDetails(entry.getKey().getData());
+        for (Map.Entry<ByteArrayWrapper, StateDetails> entry : contractDetailes.entrySet()) {
+            StateDetails details = getStateDetails(entry.getKey().getData());
             for (DataWord key : entry.getValue().getStorageKeys()) {
                 details.put(key, entry.getValue().get(key));
             }
@@ -473,7 +475,7 @@ public class RepositoryImpl implements Repository, org.ethereum.facade.Repositor
     }
 
     @Override
-    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, ContractDetails> cacheDetails) {
+    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, StateDetails> cacheDetails) {
         throw new RuntimeException("Not supported");
     }
 

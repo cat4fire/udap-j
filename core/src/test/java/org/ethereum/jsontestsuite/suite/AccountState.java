@@ -109,7 +109,7 @@ public class AccountState {
         return storage;
     }
 
-    public List<String> compareToReal(org.ethereum.core.AccountState state, ContractDetailsImpl details) {
+    public List<String> compareToReal(org.ethereum.core.AccountState state, StateDetailsImpl details) {
 
         List<String> results = new ArrayList<>();
 

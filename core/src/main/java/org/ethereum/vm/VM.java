@@ -17,24 +17,7 @@
  */
 package org.ethereum.vm;
 
-import org.ethereum.config.BlockchainConfig;
-import org.ethereum.config.SystemProperties;
-import org.ethereum.db.ContractDetails;
-import org.ethereum.vm.program.Program;
-import org.ethereum.vm.program.Stack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongycastle.util.encoders.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static org.ethereum.crypto.HashUtil.sha3;
-import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static org.ethereum.vm.OpCode.*;
 
 /**
  * The Ethereum Virtual Machine (EVM) is responsible for initialization
@@ -1385,8 +1368,8 @@ import static org.ethereum.vm.OpCode.*;
                 case RETURN:
                 case SUICIDE:
 
-                    ContractDetails details = program.getStorage()
-                            .getContractDetails(program.getOwnerAddress().getLast20Bytes());
+                    StateDetails details = program.getStorage()
+                            .getStateDetails(program.getOwnerAddress().getLast20Bytes());
                     List<DataWord> storageKeys = new ArrayList<>(details.getStorage().keySet());
                     Collections.sort(storageKeys);
 
@@ -1415,8 +1398,8 @@ import static org.ethereum.vm.OpCode.*;
                 dumpLogger.trace("{}", memoryString);
 
             dumpLogger.trace("    STORAGE");
-            ContractDetails details = program.getStorage()
-                    .getContractDetails(program.getOwnerAddress().getLast20Bytes());
+            StateDetails details = program.getStorage()
+                    .getStateDetails(program.getOwnerAddress().getLast20Bytes());
             List<DataWord> storageKeys = new ArrayList<>(details.getStorage().keySet());
             Collections.sort(storageKeys);
 

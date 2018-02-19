@@ -18,7 +18,7 @@
 package org.ethereum.core;
 
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.vm.DataWord;
 
 import java.math.BigInteger;
@@ -69,7 +69,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr of the account
      * @return new value of the nonce
      */
-    BigInteger increaseNonce(byte[] addr);
+    //BigInteger increaseNonce(byte[] addr);
 
     BigInteger increaseNonce(byte[] addr, BigInteger accountType);
 
@@ -80,7 +80,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param nonce new nonce
      * @return new value of the nonce
      */
-    BigInteger setNonce(byte[] addr, BigInteger nonce);
+    //BigInteger setNonce(byte[] addr, BigInteger nonce);
 
     BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce);
 
@@ -98,9 +98,9 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param addr of the account
      * @return new contract details
      */
-    ContractDetails getContractDetails(byte[] addr);
+    StateDetails getStateDetails(byte[] addr);
 
-    boolean hasContractDetails(byte[] addr);
+    boolean hasStateDetails(byte[] addr);
 
     /**
      * Store code associated with an account
@@ -133,7 +133,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param key   of the data to store
      * @param value is the data to store
      */
-    void addStorageRow(byte[] addr, DataWord key, DataWord value);
+    //void addStorageRow(byte[] addr, DataWord key, DataWord value);
 
     void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value);
 
@@ -163,7 +163,7 @@ public interface Repository extends org.ethereum.facade.Repository {
      * @param value to be added
      * @return new balance of the account
      */
-    BigInteger addBalance(byte[] addr, BigInteger value);
+    //BigInteger addBalance(byte[] addr, BigInteger value);
 
     BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value);
 
@@ -235,13 +235,13 @@ public interface Repository extends org.ethereum.facade.Repository {
     void reset();
 
     void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates,
-                     HashMap<ByteArrayWrapper, ContractDetails> contractDetailes);
+                     HashMap<ByteArrayWrapper, StateDetails> contractDetailes);
 
 
     byte[] getRoot();
 
     void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts,
-                     HashMap<ByteArrayWrapper, ContractDetails> cacheDetails);
+                     HashMap<ByteArrayWrapper, StateDetails> cacheDetails);
 
     Repository getSnapshotTo(byte[] root);
 }

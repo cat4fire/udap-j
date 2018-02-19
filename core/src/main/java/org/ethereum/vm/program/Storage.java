@@ -21,7 +21,7 @@ import org.ethereum.core.AccountState;
 import org.ethereum.core.Block;
 import org.ethereum.core.Repository;
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.vm.DataWord;
 import org.ethereum.vm.program.invoke.ProgramInvoke;
 import org.ethereum.vm.program.listener.ProgramListener;
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Storage implements Repository, ProgramListenerAware {
+/*public class Storage implements Repository, ProgramListenerAware {
 
     private final Repository repository;
     private final DataWord address;
@@ -77,8 +77,18 @@ public class Storage implements Repository, ProgramListenerAware {
     }
 
     @Override
+    public BigInteger increaseNonce(byte[] addr, BigInteger accountType) {
+        return repository.increaseNonce(addr,accountType);
+    }
+
+    @Override
     public BigInteger setNonce(byte[] addr, BigInteger nonce) {
         return repository.setNonce(addr, nonce);
+    }
+
+    @Override
+    public BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce) {
+        return repository.setNonce(addr, accountType, nonce);
     }
 
     @Override
@@ -87,16 +97,16 @@ public class Storage implements Repository, ProgramListenerAware {
     }
 
     @Override
-    public ContractDetails getContractDetails(byte[] addr) {
-        return repository.getContractDetails(addr);
+    public StateDetails getStateDetails(byte[] addr) {
+        return repository.getStateDetails(addr);
     }
 
     @Override
-    public boolean hasContractDetails(byte[] addr) {
-        return repository.hasContractDetails(addr);
+    public boolean hasStateDetails(byte[] addr) {
+        return repository.hasStateDetails(addr);
     }
 
-    /*@Override
+    *//*@Override
     public void saveCode(byte[] addr, byte[] code) {
         repository.saveCode(addr, code);
     }
@@ -109,12 +119,18 @@ public class Storage implements Repository, ProgramListenerAware {
     @Override
     public byte[] getCodeHash(byte[] addr) {
         return repository.getCodeHash(addr);
-    }*/
+    }*//*
 
     @Override
     public void addStorageRow(byte[] addr, DataWord key, DataWord value) {
         if (canListenTrace(addr)) programListener.onStoragePut(key, value);
         repository.addStorageRow(addr, key, value);
+    }
+
+    @Override
+    public void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value) {
+        if (canListenTrace(addr)) programListener.onStoragePut(key, value);
+        repository.addStorageRow(addr, accountType, key, value);
     }
 
     private boolean canListenTrace(byte[] address) {
@@ -134,6 +150,11 @@ public class Storage implements Repository, ProgramListenerAware {
     @Override
     public BigInteger addBalance(byte[] addr, BigInteger value) {
         return repository.addBalance(addr, value);
+    }
+
+    @Override
+    public BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value) {
+        return repository.addBalance(addr, accountType, value);
     }
 
     @Override
@@ -193,11 +214,11 @@ public class Storage implements Repository, ProgramListenerAware {
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, ContractDetails> contractDetails) {
+    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, StateDetails> contractDetails) {
         for (ByteArrayWrapper address : contractDetails.keySet()) {
             if (!canListenTrace(address.getData())) return;
 
-            ContractDetails details = contractDetails.get(address);
+            StateDetails details = contractDetails.get(address);
             if (details.isDeleted()) {
                 programListener.onStorageClear();
             } else if (details.isDirty()) {
@@ -215,7 +236,7 @@ public class Storage implements Repository, ProgramListenerAware {
     }
 
     @Override
-    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, ContractDetails> cacheDetails) {
+    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, StateDetails> cacheDetails) {
         repository.loadAccount(addr, cacheAccounts, cacheDetails);
     }
 
@@ -238,4 +259,4 @@ public class Storage implements Repository, ProgramListenerAware {
     public Map<DataWord, DataWord> getStorage(byte[] addr, @Nullable Collection<DataWord> keys) {
         return repository.getStorage(addr, keys);
     }
-}
+}*/

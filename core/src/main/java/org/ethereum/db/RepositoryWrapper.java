@@ -72,8 +72,18 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
+    public BigInteger increaseNonce(byte[] addr, BigInteger accountType) {
+        return blockchain.getRepository().increaseNonce(addr, accountType);
+    }
+
+    @Override
     public BigInteger setNonce(byte[] addr, BigInteger nonce) {
         return blockchain.getRepository().setNonce(addr, nonce);
+    }
+
+    @Override
+    public BigInteger setNonce(byte[] addr, BigInteger accountType, BigInteger nonce) {
+        return blockchain.getRepository().setNonce(addr, accountType, nonce);
     }
 
     @Override
@@ -82,13 +92,13 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
-    public ContractDetails getContractDetails(byte[] addr) {
-        return blockchain.getRepository().getContractDetails(addr);
+    public StateDetails getStateDetails(byte[] addr) {
+        return blockchain.getRepository().getStateDetails(addr);
     }
 
     @Override
-    public boolean hasContractDetails(byte[] addr) {
-        return blockchain.getRepository().hasContractDetails(addr);
+    public boolean hasStateDetails(byte[] addr) {
+        return blockchain.getRepository().hasStateDetails(addr);
     }
 
     /*@Override
@@ -112,6 +122,11 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
+    public void addStorageRow(byte[] addr, BigInteger accountType, DataWord key, DataWord value) {
+        blockchain.getRepository().addStorageRow(addr, accountType, key, value);
+    }
+
+    @Override
     public DataWord getStorageValue(byte[] addr, DataWord key) {
         return blockchain.getRepository().getStorageValue(addr, key);
     }
@@ -124,6 +139,11 @@ public class RepositoryWrapper implements Repository {
     @Override
     public BigInteger addBalance(byte[] addr, BigInteger value) {
         return blockchain.getRepository().addBalance(addr, value);
+    }
+
+    @Override
+    public BigInteger addBalance(byte[] addr, BigInteger accountType, BigInteger value) {
+        return blockchain.getRepository().addBalance(addr, accountType, value);
     }
 
     @Override
@@ -182,7 +202,7 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
-    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, ContractDetails> contractDetailes) {
+    public void updateBatch(HashMap<ByteArrayWrapper, AccountState> accountStates, HashMap<ByteArrayWrapper, StateDetails> contractDetailes) {
         blockchain.getRepository().updateBatch(accountStates, contractDetailes);
     }
 
@@ -192,7 +212,7 @@ public class RepositoryWrapper implements Repository {
     }
 
     @Override
-    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, ContractDetails> cacheDetails) {
+    public void loadAccount(byte[] addr, HashMap<ByteArrayWrapper, AccountState> cacheAccounts, HashMap<ByteArrayWrapper, StateDetails> cacheDetails) {
         blockchain.getRepository().loadAccount(addr, cacheAccounts, cacheDetails);
     }
 

@@ -17,13 +17,10 @@
  */
 package org.ethereum.core;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.lang3.tuple.Pair;
 import org.ethereum.config.BlockchainConfig;
 import org.ethereum.config.CommonConfig;
 import org.ethereum.config.SystemProperties;
 import org.ethereum.db.BlockStore;
-import org.ethereum.db.ContractDetails;
 import org.ethereum.listener.EthereumListener;
 import org.ethereum.listener.EthereumListenerAdapter;
 import org.ethereum.util.ByteArraySet;
@@ -37,15 +34,11 @@ import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.lang3.ArrayUtils.getLength;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE_ANY;
 import static org.ethereum.util.BIUtil.*;
-import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
-import static org.ethereum.util.ByteUtil.toHexString;
 /*import static org.ethereum.vm.VMUtils.saveProgramTraceFile;
 import static org.ethereum.vm.VMUtils.zipAndEncode;*/
 
@@ -199,7 +192,7 @@ public class TransactionExecutor {
 
             BigInteger txGasLimit = toBI(tx.getGasLimit());
             BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
-            track.addBalance(tx.getSender(), txGasCost.negate());
+            track.addBalance(tx.getSender(), ACCOUNT_TYPE_ANY, txGasCost.negate());
 
             if (logger.isInfoEnabled())
                 logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
@@ -324,7 +317,7 @@ public class TransactionExecutor {
             // reset storage if the contract with the same address already exists
             // TCK test case only - normally this is near-impossible situation in the real network
             // TODO make via Trie.clear() without keyset
-//            ContractDetails contractDetails = program.getStorage().getContractDetails(newContractAddress);
+//            StateDetails contractDetails = program.getStorage().getStateDetails(newContractAddress);
 //            for (DataWord key : contractDetails.getStorageKeys()) {
 //                program.storageSave(key, DataWord.ZERO);
 //            }
@@ -521,15 +514,15 @@ public class TransactionExecutor {
                     .deletedAccounts(result.getDeleteAccounts())
                     /*.internalTransactions(result.getInternalTransactions())*/;
 
-            ContractDetails contractDetails = track.getContractDetails(addr);
+/*            StateDetails contractDetails = track.getStateDetails(addr);
             if (contractDetails != null) {
                 // TODO
-//                summaryBuilder.storageDiff(track.getContractDetails(addr).getStorage());
+//                summaryBuilder.storageDiff(track.getStateDetails(addr).getStorage());
 //
 //                if (program != null) {
 //                    summaryBuilder.touchedStorage(contractDetails.getStorage(), program.getStorageDiff());
 //                }
-            }
+            }*/
 
             if (result.getException() != null) {
                 summaryBuilder.markAsFailed();
@@ -539,11 +532,11 @@ public class TransactionExecutor {
         TransactionExecutionSummary summary = summaryBuilder.build();
 
         // Refund for gas leftover
-        track.addBalance(tx.getSender(), summary.getLeftover().add(summary.getRefund()));
+        track.addBalance(tx.getSender(), ACCOUNT_TYPE_ANY, summary.getLeftover().add(summary.getRefund()));
         logger.info("Pay total refund to sender: [{}], refund val: [{}]", Hex.toHexString(tx.getSender()), summary.getRefund());
 
         // Transfer fees to miner
-        track.addBalance(coinbase, summary.getFee());
+        track.addBalance(coinbase, ACCOUNT_TYPE_ANY, summary.getFee());
         touchedAccounts.add(coinbase);
         logger.info("Pay fees to miner: [{}], feesEarned: [{}]", Hex.toHexString(coinbase), summary.getFee());
 

@@ -17,26 +17,6 @@
  */
 package org.ethereum.json;
 
-import org.ethereum.config.SystemProperties;
-import org.ethereum.core.AccountState;
-import org.ethereum.core.Block;
-import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
-import org.ethereum.core.Repository;
-import org.ethereum.util.ByteUtil;
-import org.ethereum.vm.DataWord;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import org.spongycastle.util.encoders.Hex;
-
-import java.math.BigInteger;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * JSON Helper class to format data into ObjectNodes
  * to match PyEthereum blockstate output
@@ -61,10 +41,10 @@ import java.util.List;
  * @author Roman Mandeleil
  * @since 26.06.2014
  */
-public class JSONHelper {
+/*public class JSONHelper {
 
     @SuppressWarnings("uncheked")
-    public static void dumpState(ObjectNode statesNode, String address, AccountState state, ContractDetails details) {
+    public static void dumpState(ObjectNode statesNode, String address, AccountState state, StateDetails details) {
 
         List<DataWord> storageKeys = new ArrayList<>(details.getStorage().keySet());
         Collections.sort(storageKeys);
@@ -108,7 +88,7 @@ public class JSONHelper {
         for (ByteArrayWrapper key : keys) {
             byte[] keyBytes = key.getData();
             AccountState accountState = repository.getAccountState(keyBytes);
-            ContractDetails details = repository.getContractDetails(keyBytes);
+            StateDetails details = repository.getStateDetails(keyBytes);
             dumpState(statesNode, Hex.toHexString(keyBytes), accountState, details);
         }
         blockNode.set("state", statesNode);
@@ -126,4 +106,4 @@ public class JSONHelper {
 //              stateRoot, codeHash, code, storage);
     }
 
-}
+}*/

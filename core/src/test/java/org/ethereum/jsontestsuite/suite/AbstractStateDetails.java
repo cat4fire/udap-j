@@ -18,7 +18,7 @@
 package org.ethereum.jsontestsuite.suite;
 
 import org.ethereum.db.ByteArrayWrapper;
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.spongycastle.util.encoders.Hex;
 
 import java.util.HashMap;
@@ -29,18 +29,18 @@ import static org.ethereum.crypto.HashUtil.EMPTY_DATA_HASH;
 import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
 
 /**
- * Common functionality for ContractDetails implementations
+ * Common functionality for StateDetails implementations
  * <p>
  * Created by Anton Nashatyrev on 24.03.2016.
  */
-public abstract class AbstractContractDetails implements ContractDetails {
+public abstract class AbstractStateDetails implements StateDetails {
 
     private boolean dirty = false;
     private boolean deleted = false;
 
     private Map<ByteArrayWrapper, byte[]> codes = new HashMap<>();
 
-    @Override
+    /*@Override
     public byte[] getCode() {
         return codes.size() == 0 ? EMPTY_BYTE_ARRAY : codes.values().iterator().next();
     }
@@ -58,7 +58,7 @@ public abstract class AbstractContractDetails implements ContractDetails {
         if (code == null) return;
         codes.put(new ByteArrayWrapper(sha3(code)), code);
         setDirty(true);
-    }
+    }*/
 
     protected Map<ByteArrayWrapper, byte[]> getCodes() {
         return codes;
@@ -92,7 +92,7 @@ public abstract class AbstractContractDetails implements ContractDetails {
         return deleted;
     }
 
-    public abstract ContractDetails clone();
+    public abstract StateDetails clone();
 
     @Override
     public String toString() {

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface ContractDetails {
+public interface StateDetails {
 
     void put(DataWord key, DataWord value);
 
@@ -67,11 +67,11 @@ public interface ContractDetails {
 
     void setAddress(byte[] address);
 
-    ContractDetails clone();
+    StateDetails clone();
 
     String toString();
 
     void syncStorage();
 
-    ContractDetails getSnapshotTo(byte[] hash);
+    StateDetails getSnapshotTo(byte[] hash);
 }

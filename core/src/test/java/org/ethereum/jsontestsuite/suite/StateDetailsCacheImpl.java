@@ -17,7 +17,7 @@
  */
 package org.ethereum.jsontestsuite.suite;
 
-import org.ethereum.db.ContractDetails;
+import org.ethereum.db.StateDetails;
 import org.ethereum.trie.SecureTrie;
 import org.ethereum.util.RLP;
 import org.ethereum.vm.DataWord;
@@ -30,17 +30,17 @@ import static java.util.Collections.unmodifiableMap;
  * @author Roman Mandeleil
  * @since 24.06.2014
  */
-public class ContractDetailsCacheImpl extends AbstractContractDetails {
+public class StateDetailsCacheImpl extends AbstractStateDetails {
 
     private Map<DataWord, DataWord> storage = new HashMap<>();
 
-    ContractDetails origContract;
+    StateDetails origContract;
 
-    public ContractDetailsCacheImpl(ContractDetails origContract) {
+    public StateDetailsCacheImpl(StateDetails origContract) {
         this.origContract = origContract;
         if (origContract != null) {
-            if (origContract instanceof AbstractContractDetails) {
-                setCodes(((AbstractContractDetails) this.origContract).getCodes());
+            if (origContract instanceof AbstractStateDetails) {
+                setCodes(((AbstractStateDetails) this.origContract).getCodes());
             } else {
                 setCode(origContract.getCode());
             }
@@ -157,9 +157,9 @@ public class ContractDetailsCacheImpl extends AbstractContractDetails {
     }
 
     @Override
-    public ContractDetails clone() {
+    public StateDetails clone() {
 
-        ContractDetailsCacheImpl contractDetails = new ContractDetailsCacheImpl(origContract);
+        StateDetailsCacheImpl contractDetails = new StateDetailsCacheImpl(origContract);
 
         Object storageClone = ((HashMap<DataWord, DataWord>) storage).clone();
 
@@ -181,8 +181,8 @@ public class ContractDetailsCacheImpl extends AbstractContractDetails {
             origContract.put(key, storage.get(key));
         }
 
-        if (origContract instanceof AbstractContractDetails) {
-            ((AbstractContractDetails) origContract).appendCodes(getCodes());
+        if (origContract instanceof AbstractStateDetails) {
+            ((AbstractStateDetails) origContract).appendCodes(getCodes());
         } else {
             origContract.setCode(getCode());
         }
@@ -191,7 +191,7 @@ public class ContractDetailsCacheImpl extends AbstractContractDetails {
 
 
     @Override
-    public ContractDetails getSnapshotTo(byte[] hash) {
+    public StateDetails getSnapshotTo(byte[] hash) {
         throw new UnsupportedOperationException("No snapshot option during cache state");
     }
 }

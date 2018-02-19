@@ -319,8 +319,8 @@ public class TestRunner {
 
                             byte[] expectedStValue = storage.get(storageKey).getData();
 
-                            ContractDetails contractDetails =
-                                    program.getStorage().getContractDetails(accountState.getAddress());
+                            StateDetails contractDetails =
+                                    program.getStorage().getStateDetails(accountState.getAddress());
 
                             if (contractDetails == null) {
 

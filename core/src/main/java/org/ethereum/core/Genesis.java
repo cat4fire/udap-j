@@ -25,6 +25,8 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.ethereum.core.AccountState.ACCOUNT_TYPE_EXTERNAL;
+
 /**
  * The genesis block is the first block in the chain and has fixed values according to
  * the protocol specification. The genesis block is 13 items, and is specified thus:
@@ -87,7 +89,7 @@ public class Genesis extends Block {
             final Genesis.PremineAccount premineAccount = genesis.getPremine().get(key);
             final AccountState accountState = premineAccount.accountState;
 
-            repository.createAccount(key.getData());
+            repository.createAccount(key.getData(), ACCOUNT_TYPE_EXTERNAL);
             repository.setNonce(key.getData(), accountState.getNonce());
             repository.addBalance(key.getData(), accountState.getBalance());
             /*if (premineAccount.code != null) {
