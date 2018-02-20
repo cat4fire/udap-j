@@ -33,6 +33,7 @@ import java.util.*;
 /**
  * Created by Anton Nashatyrev on 01.12.2016.
  */
+/*
 public class IterableTestRepository implements Repository {
     Repository src;
 
@@ -410,3 +411,4 @@ public class IterableTestRepository implements Repository {
         }
     }
 }
+*/

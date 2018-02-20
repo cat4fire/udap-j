@@ -33,6 +33,7 @@ import static org.ethereum.util.ByteUtil.EMPTY_BYTE_ARRAY;
  * <p>
  * Created by Anton Nashatyrev on 24.03.2016.
  */
+/*
 public abstract class AbstractStateDetails implements StateDetails {
 
     private boolean dirty = false;
@@ -40,7 +41,8 @@ public abstract class AbstractStateDetails implements StateDetails {
 
     private Map<ByteArrayWrapper, byte[]> codes = new HashMap<>();
 
-    /*@Override
+    */
+/*@Override
     public byte[] getCode() {
         return codes.size() == 0 ? EMPTY_BYTE_ARRAY : codes.values().iterator().next();
     }
@@ -58,7 +60,8 @@ public abstract class AbstractStateDetails implements StateDetails {
         if (code == null) return;
         codes.put(new ByteArrayWrapper(sha3(code)), code);
         setDirty(true);
-    }*/
+    }*//*
+
 
     protected Map<ByteArrayWrapper, byte[]> getCodes() {
         return codes;
@@ -101,3 +104,4 @@ public abstract class AbstractStateDetails implements StateDetails {
         return ret;
     }
 }
+*/

@@ -206,9 +206,9 @@ public class TransactionExecutor {
 
         BigInteger endowment = toBI(tx.getValue());
 
-        byte[] targetAddress = tx.getReceiveAddress();
+        /*byte[] targetAddress = tx.getReceiveAddress();
         transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
-        touchedAccounts.add(targetAddress);
+        touchedAccounts.add(targetAddress);*/
 
 
             return;
@@ -237,7 +237,7 @@ public class TransactionExecutor {
     private void call() {
         if (!readyToExecute) return;
 
-        byte[] targetAddress = tx.getReceiveAddress();
+        //byte[] targetAddress = tx.getReceiveAddress();
 /*        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
 
         if (precompiledContract != null) {
@@ -282,9 +282,9 @@ public class TransactionExecutor {
         /*}*/
 
         BigInteger endowment = toBI(tx.getValue());
-        transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
+        /*transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
 
-        touchedAccounts.add(targetAddress);
+        touchedAccounts.add(targetAddress);*/
     }
 
     /*private void create() {
@@ -475,8 +475,8 @@ public class TransactionExecutor {
         cacheTrack.rollback();
 
         // remove touched account
-        touchedAccounts.remove(
-                tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress());
+        /*touchedAccounts.remove(
+                tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress());*/
     }
 
     public TransactionExecutionSummary finalization() {
@@ -505,7 +505,7 @@ public class TransactionExecutor {
             result.addFutureRefund(result.getDeleteAccounts().size() * config.getBlockchainConfig().
                     getConfigForBlock(currentBlock.getNumber()).getGasCost().getSUICIDE_REFUND());
             long gasRefund = Math.min(result.getFutureRefund(), getGasUsed() / 2);
-            byte[] addr = tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress();
+            //byte[] addr = tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress();
             m_endGas = m_endGas.add(BigInteger.valueOf(gasRefund));
 
             summaryBuilder
