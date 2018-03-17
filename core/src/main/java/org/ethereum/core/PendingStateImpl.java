@@ -408,6 +408,8 @@ public class PendingStateImpl implements PendingState {
 
         Block best = getBestBlock();
 
+        //getRepository() makes cache just for one time and for all TransactionExecutor
+        //TransactionExecutor alse makes cache
         TransactionExecutor executor = new TransactionExecutor(
                 tx, best.getCoinbase(), getRepository(),
                 blockStore, programInvokeFactory, createFakePendingBlock(), new EthereumListenerAdapter(), 0)

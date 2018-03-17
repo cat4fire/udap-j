@@ -133,7 +133,9 @@ public class TransactionExecutor {
      * set readyToExecute = true
      */
     public void init() {
-        basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
+        //homestead config computes length of tx to charge fee
+        //basicTxCost = tx.transactionCost(config.getBlockchainConfig(), currentBlock);
+        basicTxCost = 0;
 
         if (localCall) {
             readyToExecute = true;
@@ -189,11 +191,7 @@ public class TransactionExecutor {
 
         //lycrus
         if (!readyToExecute) return;
-        //byte[] lycrusAddress = null;
 
-        //lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
-
-        //if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
         if (!localCall) {
             //        track.increaseNonce(tx.getSender());
 
@@ -204,21 +202,25 @@ public class TransactionExecutor {
             if (logger.isInfoEnabled())
                 logger.info("Paying: txGasCost: [{}], gasPrice: [{}], gasLimit: [{}]", txGasCost, toBI(tx.getGasPrice()), txGasLimit);
         }
-            ProgramInvoke programInvoke =
-                    programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
-//cacheTrack -> track
-            //this.vm = new VM(config);
+        ProgramInvoke programInvoke =
+                programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
+
+        //cacheTrack -> track
+        //this.vm = new VM(config);
         //byte[] code = track.getCode(targetAddress);
-            this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
+
+        this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
 
         BigInteger endowment = toBI(tx.getValue());
 
         byte[] targetAddress = tx.getReceiveAddress();
-        transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
-        touchedAccounts.add(targetAddress);
+        if (targetAddress != null) {
+            transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
+            touchedAccounts.add(targetAddress);
+        }
 
 
-            return;
+        return;
         // }
         //lycrus
 
@@ -280,8 +282,8 @@ public class TransactionExecutor {
                 m_endGas = m_endGas.subtract(BigInteger.valueOf(basicTxCost));
                 result.spendGas(basicTxCost);
             } else {*/
-                ProgramInvoke programInvoke =
-                        programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
+        ProgramInvoke programInvoke =
+                programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 
         //this.vm = new VM(config);
         this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
