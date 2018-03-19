@@ -87,7 +87,7 @@ public class Program {
     private Storage storage;
     private byte[] returnDataBuffer;
 
-    private ProgramResult result = new ProgramResult();
+    public ProgramResult result = new ProgramResult();
     private ProgramTrace trace = new ProgramTrace();
 
     private ProgramPrecompile programPrecompile;

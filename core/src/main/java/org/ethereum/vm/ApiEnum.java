@@ -4,10 +4,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.ethereum.core.CallTransaction;
 import org.ethereum.vm.applications.MiniContract;
 import org.ethereum.vm.program.Program;
-import org.spongycastle.util.encoders.Hex;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public enum ApiEnum {
 
@@ -15,16 +13,59 @@ public enum ApiEnum {
     FOO("foo", CallTransaction.Function.fromSignature("foo", new String[]{"uint256", "uint256"}, new String[]{"uint256"})),
     BAR("bar", CallTransaction.Function.fromSignature("bar", new String[]{"uint256", "uint256"}, new String[]{"uint256"})),
 
-    MiniConTractCreate("MiniContractCreate", CallTransaction.Function.fromSignature(
+    MiniContractCreate("MiniContractCreate", CallTransaction.Function.fromSignature(
             "MiniContractCreate",
-            new String[]{"string", //content
-                    "bytes32[]",//pictures
-                    "bytes32[]",//voice
-                    "bytes32[]",//video
+            new String[]{
+                    "string", //content
                     "address",//party A
-                    "address"//party B
+                    "address",//party B
+                    "string",//title
+            },
+            new String[0])),
+    MiniContractModify("MiniContractModify", CallTransaction.Function.fromSignature(
+            "MiniContractModify",
+            new String[]{
+                    "address",//Minicontract to modify
+                    "string", //content
+                    "address",//party A
+                    "address",//party B
+                    "string",//title
+            },
+            new String[0])),
+    MiniContractConfirm("MiniContractConfirm", CallTransaction.Function.fromSignature(
+            "MiniContractConfirm",
+            new String[]{
+                    "address"//Minicontract to confirm
+            },
+            new String[0])),
+    MiniContractAbolish("MiniContractAbolish", CallTransaction.Function.fromSignature(
+            "MiniContractAbolish",
+            new String[]{
+                    "address"//Minicontract to confirm
+            },
+            new String[0])),
+
+    MiniCoinCreate("MiniCoinCreate", CallTransaction.Function.fromSignature(
+            "MiniCoinCreate",
+            new String[]{
+                    "string", //content
+                    "string",//title
+                    "bytes32",//logo
+                    "uint256",//fixed , 0 for mintable and non-0 for fixed and represents its capacity
+                    "uint256",//transferable 0 for able and 1 for disable
+                    "address"//issuer
+                    //more decorate and background images
+            },
+            new String[0])),
+    MiniCoinMint("MiniCoinMint", CallTransaction.Function.fromSignature(
+            "MiniCoinMint",
+            new String[]{
+                    "address", //coin address
+                    "address",//receiver
+                    "uint256",//amount
             },
             new String[0])),;
+
     private String name;
 
     private CallTransaction.Function function;
@@ -68,7 +109,7 @@ public enum ApiEnum {
             case HELLOWORLD:
                 api.helloworld();
                 break;
-            case MiniConTractCreate:
+            case MiniContractCreate:
                 new MiniContract(api).miniContractCreate();
                 break;
             default:

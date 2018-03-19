@@ -92,30 +92,30 @@ public class Api {
         return ret;
     }
 
-    public void setString(DataWord accout, DataWord address, String input) {
+    public void setString(DataWord account, DataWord address, String input) {
         byte[] b = input.getBytes(Charset.forName("UTF-8"));
         int len = b.length;
-        program.storageSave(accout, address, new DataWord(len));
+        program.storageSave(account, address, new DataWord(len));
 
         int addr = address.intValue();
         for (int i = 0; i < len; i += 32) {
             byte[] t = ArrayUtils.subarray(b, i, i + 32);
             DataWord d = new DataWord(t);
-            program.storageSave(accout, new DataWord(addr + 1 + i), d);
+            program.storageSave(account, new DataWord(addr + 1 + i), d);
         }
     }
 
     // 0 ,1 ,2 ,..... 31, 32   all 33
     //
 
-    public String getString(DataWord accout, DataWord address) {
-        DataWord dlen = program.storageLoad(accout, address);
+    public String getString(DataWord account, DataWord address) {
+        DataWord dlen = program.storageLoad(account, address);
         int len = dlen.intValue();
 
         byte[] load = new byte[0];
         int addr = address.intValue();
         for (int i = 0; i < len; i += 32) {
-            DataWord data = program.storageLoad(accout, new DataWord(addr + 1 + i));
+            DataWord data = program.storageLoad(account, new DataWord(addr + 1 + i));
             byte[] d = data.getData();
             if (len - i < 32) {
                 d = ArrayUtils.subarray(d, 32 - (len - i), 32);
