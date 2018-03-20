@@ -142,7 +142,8 @@ public class TransactionReceipt {
     }
 
     public boolean isValid() {
-        return ByteUtil.byteArrayToLong(gasUsed) > 0;
+        return true;//cause udap doesn't use any gas so far
+        /*return ByteUtil.byteArrayToLong(gasUsed) > 0;*/
     }
 
     public boolean isSuccessful() {

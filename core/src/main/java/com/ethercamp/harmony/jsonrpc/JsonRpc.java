@@ -28,6 +28,7 @@ import org.ethereum.core.Block;
 import org.ethereum.core.CallTransaction;
 import org.ethereum.core.Transaction;
 import org.ethereum.vm.LogInfo;
+import org.spongycastle.util.encoders.Hex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -191,7 +192,8 @@ public interface JsonRpc {
             blockHash = b == null ? null : toJsonHex(b.getHash());
             transactionIndex = b == null ? null : toJsonHex(txIndex);
             transactionHash = toJsonHex(tx.getHash());
-            address = tx.getReceiveAddress() == null ? null : toJsonHex(tx.getReceiveAddress());
+            //address = tx.getReceiveAddress() == null ? null : toJsonHex(tx.getReceiveAddress());
+            address = Hex.toHexString(logInfo.getAddress());
             data = toJsonHex(logInfo.getData());
             topics = new String[logInfo.getTopics().size()];
             for (int i = 0; i < topics.length; i++) {

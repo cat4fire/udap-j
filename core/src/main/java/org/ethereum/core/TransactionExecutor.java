@@ -160,13 +160,15 @@ public class TransactionExecutor {
             return;
         }
 
-/*        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
+        BigInteger reqNonce = track.getNonce(tx.getSender());//todo change nonce module later
         BigInteger txNonce = toBI(tx.getNonce());
+
+
         if (isNotEqual(reqNonce, txNonce)) {
             execError(String.format("Invalid nonce: required: %s , tx.nonce: %s", reqNonce, txNonce));
 
             return;
-        }*/
+        }
 
         BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
         BigInteger totalCost = toBI(tx.getValue()).add(txGasCost);
@@ -193,7 +195,7 @@ public class TransactionExecutor {
         if (!readyToExecute) return;
 
         if (!localCall) {
-            //        track.increaseNonce(tx.getSender());
+            track.increaseNonce(tx.getSender());
 
             BigInteger txGasLimit = toBI(tx.getGasLimit());
             BigInteger txGasCost = toBI(tx.getGasPrice()).multiply(txGasLimit);
@@ -211,14 +213,14 @@ public class TransactionExecutor {
 
         this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
 
-        BigInteger endowment = toBI(tx.getValue());
-
-        byte[] targetAddress = tx.getReceiveAddress();
-        if (targetAddress != null) {
-            transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
-            touchedAccounts.add(targetAddress);
+        if (!localCall) {
+            BigInteger endowment = toBI(tx.getValue());
+            byte[] targetAddress = tx.getReceiveAddress();
+            if (targetAddress != null) {
+                transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
+                touchedAccounts.add(targetAddress);
+            }
         }
-
 
         return;
         // }
@@ -243,11 +245,11 @@ public class TransactionExecutor {
         *//*}*/
     }
 
-    private void call() {
+    /*private void call() {
         if (!readyToExecute) return;
 
         byte[] targetAddress = tx.getReceiveAddress();
-/*        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
+        precompiledContract = PrecompiledContracts.getContractForAddress(new DataWord(targetAddress), blockchainConfig);
 
         if (precompiledContract != null) {
             long requiredGas = precompiledContract.getGasForData(tx.getData());
@@ -275,26 +277,26 @@ public class TransactionExecutor {
                 }
             }
 
-        } else {*/
+        } else {
 
-            /*byte[] code = track.getCode(targetAddress);
+            byte[] code = track.getCode(targetAddress);
             if (isEmpty(code)) {
                 m_endGas = m_endGas.subtract(BigInteger.valueOf(basicTxCost));
                 result.spendGas(basicTxCost);
-            } else {*/
+            } else {
         ProgramInvoke programInvoke =
                 programInvokeFactory.createProgramInvoke(tx, currentBlock, cacheTrack, blockStore);
 
         //this.vm = new VM(config);
         this.program = new Program(programInvoke, tx, config).withCommonConfig(commonConfig);
-            /*}*/
-        /*}*/
+            }
+        }
 
         BigInteger endowment = toBI(tx.getValue());
         transfer(cacheTrack, tx.getSender(), targetAddress, endowment);
 
         touchedAccounts.add(targetAddress);
-    }
+    }*/
 
     /*private void create() {
         byte[] newContractAddress = tx.getContractAddress();
@@ -340,36 +342,6 @@ public class TransactionExecutor {
 
     public void go() {
         if (!readyToExecute) return;
-
-        //lycrus
-/*        byte[] lycrusAddress = null;
-
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            byte[] data = tx.getData();
-            byte[] functionHash = Arrays.copyOfRange(data, 0, 4);
-            byte[] helloworld = Hex.decode("683dd9cc");
-            byte[] state_address = null;
-            byte[] state_value = null;
-            if (Arrays.equals(functionHash, helloworld)) {
-                state_address = Arrays.copyOfRange(data, 4, (4 + 32));
-                state_value = Arrays.copyOfRange(data, (4 + 32), (4 + 32 + 32));
-            }
-            DataWord addr = new DataWord(state_address);
-            DataWord value = new DataWord(state_value);
-
-            DataWord prev = program.storageLoad(addr);
-            if (prev != null) {
-                System.out.println(prev.toString());
-            }
-
-
-            program.storageSave(addr, value);
-            program.spendGas(50, "lycrus' magic hello world");
-            touchedAccounts.add(lycrusAddress);
-            cacheTrack.commit();
-            return;
-        }*/
 
         if (program == null) return;
         try {
@@ -511,19 +483,19 @@ public class TransactionExecutor {
 
         if (result != null) {
             // Accumulate refunds for suicides
-            result.addFutureRefund(result.getDeleteAccounts().size() * config.getBlockchainConfig().
-                    getConfigForBlock(currentBlock.getNumber()).getGasCost().getSUICIDE_REFUND());
-            long gasRefund = Math.min(result.getFutureRefund(), getGasUsed() / 2);
-            byte[] addr = tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress();
-            m_endGas = m_endGas.add(BigInteger.valueOf(gasRefund));
+            //result.addFutureRefund(result.getDeleteAccounts().size() * config.getBlockchainConfig().
+            //        getConfigForBlock(currentBlock.getNumber()).getGasCost().getSUICIDE_REFUND());
+            //long gasRefund = Math.min(result.getFutureRefund(), getGasUsed() / 2);
+            //byte[] addr = tx.isContractCreation() ? tx.getContractAddress() : tx.getReceiveAddress();
+            //m_endGas = m_endGas.add(BigInteger.valueOf(gasRefund));
 
             summaryBuilder
                     .gasUsed(toBI(result.getGasUsed()))
-                    .gasRefund(toBI(gasRefund))
+                    .gasRefund(/*toBI(gasRefund)*/BigInteger.ZERO)
                     .deletedAccounts(result.getDeleteAccounts())
                     /*.internalTransactions(result.getInternalTransactions())*/;
 
-            ContractDetails contractDetails = track.getContractDetails(addr);
+            /*ContractDetails contractDetails = track.getContractDetails(addr);
             if (contractDetails != null) {
                 // TODO
 //                summaryBuilder.storageDiff(track.getContractDetails(addr).getStorage());
@@ -531,7 +503,7 @@ public class TransactionExecutor {
 //                if (program != null) {
 //                    summaryBuilder.touchedStorage(contractDetails.getStorage(), program.getStorageDiff());
 //                }
-            }
+            }*/
 
             if (result.getException() != null) {
                 summaryBuilder.markAsFailed();
@@ -557,14 +529,14 @@ public class TransactionExecutor {
             }
         }
 
-        if (blockchainConfig.eip161()) {
+        /*if (blockchainConfig.eip161()) {
             for (byte[] acctAddr : touchedAccounts) {
                 AccountState state = track.getAccountState(acctAddr);
                 if (state != null && state.isEmpty()) {
                     track.delete(acctAddr);
                 }
             }
-        }
+        }*/
 
 
         listener.onTransactionExecuted(summary);

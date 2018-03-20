@@ -166,7 +166,7 @@ public class BlockMiner {
     private void onPendingStateChanged() {
         if (!isLocalMining && externalMiner == null) return;
 
-        logger.debug("onPendingStateChanged()");
+        //logger.debug("onPendingStateChanged()");
         if (miningBlock == null) {
             restartMining();
         } else if (miningBlock.getNumber() <= ((PendingStateImpl) pendingState).getBestBlock().getNumber()) {
@@ -273,7 +273,7 @@ public class BlockMiner {
                 task.addListener(() -> {
                     try {
                         // wow, block mined!
-                        logger.debug("wow block mined");
+                        //logger.debug("wow block mined");
                         final Block minedBlock = task.get().block;
                         if (minedBlock.getTransactionsList().size() != 0) {
                             logger.debug("!!!!!!!!!!!!!!! block mined with tx : " + Hex.toHexString(minedBlock.getTransactionsList().get(0).getHash()));
@@ -284,6 +284,10 @@ public class BlockMiner {
                         logger.warn("CancellationException occured in mining, that's OK");
                     } catch (Exception e) {
                         logger.error("exception while mining : " + e);
+                        for (int i = 0; i < 100; i++) {
+                            logger.error("exception while mining : " + e);
+                        }
+                        System.exit(11111);
                         //logger.warn("Exception during mining: ", e);
                     }
                 }, MoreExecutors.sameThreadExecutor());
@@ -298,6 +302,8 @@ public class BlockMiner {
      * In success result miner will modify this block instance.
      */
     private Block cloneBlock(Block block) {
+        Block ret = new Block(block.getEncoded());
+        byte[] encode = ret.getEncoded();
         return new Block(block.getEncoded());
     }
 
@@ -322,7 +328,7 @@ public class BlockMiner {
         // broadcast the block
         logger.debug("Importing newly mined block {} {} ...", newBlock.getShortHash(), newBlock.getNumber());
         ImportResult importResult = ((EthereumImpl) ethereum).addNewMinedBlock(newBlock);
-        logger.debug("Mined block import result is " + importResult);
+        //logger.debug("Mined block import result is " + importResult);
     }
 
     public boolean isMining() {

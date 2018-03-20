@@ -318,7 +318,7 @@ public class PendingStateImpl implements PendingState {
                 processBestInternal(mainFork.get(i), null);
             }
         } else {
-            logger.debug("PendingStateImpl.processBest: " + newBlock.getShortDescr());
+            //logger.debug("PendingStateImpl.processBest: " + newBlock.getShortDescr());
             processBestInternal(newBlock, receipts);
         }
 

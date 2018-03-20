@@ -1,5 +1,6 @@
 package org.ethereum.vm.applications;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ethereum.crypto.HashUtil;
 import org.ethereum.util.RLP;
 import org.ethereum.vm.Api;
@@ -7,9 +8,11 @@ import org.ethereum.vm.DataWord;
 import org.ethereum.vm.LogInfo;
 import org.spongycastle.util.encoders.Hex;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class MiniContract {
     public Api api;
 
@@ -20,7 +23,7 @@ public class MiniContract {
     /*
     storage map of MiniContract
 
-    key 0 TitleString length
+    key 0 Title String length
     key 1~n<400 TitleString, this title is plain message.
 
     key 400 party A address
@@ -30,30 +33,34 @@ public class MiniContract {
 
     key 601 contract abolished
 
-    key 1000 ContentString length
-    Key 1000~n ContentString, this content is long rich message.
+    key 1000 Content String length
+    Key 1000~n Content String, this content is long rich message.
 
     all chat messages stored in log
 
      */
 
     public void miniContractCreate() {
-        byte[] ramdon = RLP.encodeList(api.program.transaction.getSender(), new Long(System.currentTimeMillis()).toString().getBytes());
+        byte[] ramdon = RLP.encodeList(api.program.transaction.getSender(), api.program.getStorage().getNonce(api.program.transaction.getSender()).toByteArray());
         byte[] account = HashUtil.sha3omit12(ramdon);
+        api.program.getStorage().increaseNonce(api.program.transaction.getSender());
+
+        log.debug("account : " + Hex.toHexString(account));
 
         Object[] params = api.getParams();
-        String title = (String) params[0];
-        api.setString(new DataWord(account), new DataWord(0), title);
+        String content = (String) params[0];
+        api.setString(new DataWord(account), new DataWord(1000), content);
         byte[] partyA = (byte[]) params[1];
         byte[] partyB = (byte[]) params[2];
         api.program.storageSave(new DataWord(account), new DataWord(400), new DataWord(partyA));
         api.program.storageSave(new DataWord(account), new DataWord(500), new DataWord(partyB));
         api.program.storageSave(new DataWord(account), new DataWord(501), new DataWord(0));
-        String content = (String) params[3];
-        api.setString(new DataWord(account), new DataWord(1000), content);
-        List<DataWord> dataWords = new ArrayList<>();
-        dataWords.add(new DataWord("miniContractCreate"));
-        LogInfo logInfo = new LogInfo(account, dataWords, account);
+        api.program.storageSave(new DataWord(account), new DataWord(601), new DataWord(0));
+        String title = (String) params[3];
+        api.setString(new DataWord(account), new DataWord(0), title);
+        List<DataWord> topics = new ArrayList<>();
+        topics.add(new DataWord("miniContractCreate".getBytes(Charset.forName("UTF-8"))));
+        LogInfo logInfo = new LogInfo(account, topics, account);
         api.program.getResult().addLogInfo(logInfo);
         return;
     }
@@ -111,6 +118,20 @@ public class MiniContract {
             return;
         }
         api.program.storageSave(new DataWord(account), new DataWord(601), new DataWord(1));
+        return;
+    }
+
+    public void miniContractGetAll() {
+        Object[] params = api.getParams();
+        byte[] account = (byte[]) params[0];
+
+        byte[] partyA = api.program.storageLoad(new DataWord(account), new DataWord(400)).getLast20Bytes();
+        byte[] partyB = api.program.storageLoad(new DataWord(account), new DataWord(500)).getLast20Bytes();
+        long confirmation = api.program.storageLoad(new DataWord(account), new DataWord(501)).longValue();
+        long abolished = api.program.storageLoad(new DataWord(account), new DataWord(601)).longValue();
+        String title = api.getString(new DataWord(account), new DataWord(0));
+        String content = api.getString(new DataWord(account), new DataWord(1000));
+        api.setResult(new Object[]{content, partyA, partyB, title, confirmation, abolished});
         return;
     }
 

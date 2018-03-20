@@ -35,15 +35,30 @@ public enum ApiEnum {
     MiniContractConfirm("MiniContractConfirm", CallTransaction.Function.fromSignature(
             "MiniContractConfirm",
             new String[]{
-                    "address"//Minicontract to confirm
+                    "address",//Minicontract to confirm
             },
             new String[0])),
     MiniContractAbolish("MiniContractAbolish", CallTransaction.Function.fromSignature(
             "MiniContractAbolish",
             new String[]{
-                    "address"//Minicontract to confirm
+                    "address",//Minicontract to confirm
             },
             new String[0])),
+    MiniContractGetAll("MiniContractGetAll", CallTransaction.Function.fromSignature(
+            "MiniContractGetAll",
+            new String[]{
+                    "address",//Minicontract to modify
+            },
+            new String[]{
+                    "string", //content
+                    "address",//party A
+                    "address",//party B
+                    "string",//title
+                    "uint256",//confirmed
+                    "uint256",//abolished
+
+            })),
+    //====================================================================
 
     MiniCoinCreate("MiniCoinCreate", CallTransaction.Function.fromSignature(
             "MiniCoinCreate",
@@ -53,7 +68,7 @@ public enum ApiEnum {
                     "bytes32",//logo
                     "uint256",//fixed , 0 for mintable and non-0 for fixed and represents its capacity
                     "uint256",//transferable 0 for able and 1 for disable
-                    "address"//issuer
+                    "address",//issuer
                     //more decorate and background images
             },
             new String[0])),
@@ -66,10 +81,10 @@ public enum ApiEnum {
             },
             new String[0])),;
 
-    private String name;
+    public String name;
 
-    private CallTransaction.Function function;
-    private byte[] functionHash;
+    public CallTransaction.Function function;
+    public byte[] functionHash;
 
     public CallTransaction.Function getFunction() {
         return function;
@@ -111,6 +126,9 @@ public enum ApiEnum {
                 break;
             case MiniContractCreate:
                 new MiniContract(api).miniContractCreate();
+                break;
+            case MiniContractGetAll:
+                new MiniContract(api).miniContractGetAll();
                 break;
             default:
                 throw new RuntimeException("unknow Api");
