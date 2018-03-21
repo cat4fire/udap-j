@@ -79,7 +79,24 @@ public enum ApiEnum {
                     "address",//receiver
                     "uint256",//amount
             },
-            new String[0])),;
+            new String[0])),
+    MiniCoinTransfer("MiniCoinTransfer", CallTransaction.Function.fromSignature(
+            "MiniCoinTransfer",
+            new String[]{
+                    "address", //coin address
+                    "uint256",//serial number of coin
+                    "address",//transfer to
+            },
+            new String[0])),
+    MiniCoinSearch("MiniCoinSearch", CallTransaction.Function.fromSignature(
+            "MiniCoinSearch",
+            new String[]{
+                    "address", //coin address
+                    "uint256",//serial number of coin
+            },
+            new String[]{
+                    "address",//owner
+            })),;
 
     public String name;
 

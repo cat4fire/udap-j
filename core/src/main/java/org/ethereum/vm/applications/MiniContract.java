@@ -41,11 +41,12 @@ public class MiniContract {
      */
 
     public void miniContractCreate() {
+        //api.program.transaction.getSender() should be our api-server
         byte[] ramdon = RLP.encodeList(api.program.transaction.getSender(), api.program.getStorage().getNonce(api.program.transaction.getSender()).toByteArray());
         byte[] account = HashUtil.sha3omit12(ramdon);
         api.program.getStorage().increaseNonce(api.program.transaction.getSender());
 
-        log.debug("account : " + Hex.toHexString(account));
+        //log.debug("account : " + Hex.toHexString(account));
 
         Object[] params = api.getParams();
         String content = (String) params[0];
@@ -85,9 +86,10 @@ public class MiniContract {
         api.program.storageSave(new DataWord(account), new DataWord(501), new DataWord(0));
         String content = (String) params[4];
         api.setString(new DataWord(account), new DataWord(1000), content);
-        List<DataWord> dataWords = new ArrayList<>();
-        dataWords.add(new DataWord("miniContractCreate"));
-        LogInfo logInfo = new LogInfo(account, dataWords, new byte[0]);
+
+        List<DataWord> topics = new ArrayList<>();
+        topics.add(new DataWord("miniContractModify"));
+        LogInfo logInfo = new LogInfo(account, topics, account);
         api.program.getResult().addLogInfo(logInfo);
         return;
 
@@ -104,6 +106,11 @@ public class MiniContract {
             return;
         }
         api.program.storageSave(new DataWord(account), new DataWord(501), new DataWord(1));
+
+        List<DataWord> topics = new ArrayList<>();
+        topics.add(new DataWord("miniContractConfirm"));
+        LogInfo logInfo = new LogInfo(account, topics, account);
+        api.program.getResult().addLogInfo(logInfo);
         return;
     }
 
@@ -118,6 +125,11 @@ public class MiniContract {
             return;
         }
         api.program.storageSave(new DataWord(account), new DataWord(601), new DataWord(1));
+
+        List<DataWord> topics = new ArrayList<>();
+        topics.add(new DataWord("miniContractAbolish"));
+        LogInfo logInfo = new LogInfo(account, topics, account);
+        api.program.getResult().addLogInfo(logInfo);
         return;
     }
 

@@ -886,11 +886,11 @@ public class BlockchainImpl implements Blockchain, org.ethereum.facade.Blockchai
             txTrack.commit();
             final TransactionReceipt receipt = executor.getReceipt();
 
-            if (blockchainConfig.eip658()) {
+            //if (blockchainConfig.eip658()) {
                 receipt.setTxStatus(receipt.isSuccessful());
-            } else {
+            /*} else {
                 receipt.setPostTxState(track.getRoot());
-            }
+            }*/
 
             stateLogger.info("block: [{}] executed tx: [{}] \n  state: [{}]", block.getNumber(), i,
                     Hex.toHexString(track.getRoot()));

@@ -462,18 +462,6 @@ public class TransactionExecutor {
 
     public TransactionExecutionSummary finalization() {
 
-        //lycrus
-        /*byte[] lycrusAddress = null;
-
-        lycrusAddress = Hex.decode("0768f3889877330f5171c062ca13b1acd09ebfa3");
-        if (Arrays.equals(tx.sendAddress, lycrusAddress)) {
-            m_endGas = BigInteger.valueOf(100000l - 50l);
-        }*/
-
-
-        //lycrus
-
-
         if (!readyToExecute) return null;
 
         TransactionExecutionSummary.Builder summaryBuilder = TransactionExecutionSummary.builderFor(tx)
