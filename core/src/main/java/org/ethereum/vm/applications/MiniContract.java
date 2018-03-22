@@ -8,6 +8,7 @@ import org.ethereum.vm.DataWord;
 import org.ethereum.vm.LogInfo;
 import org.spongycastle.util.encoders.Hex;
 
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ public class MiniContract {
         this.api = api;
     }
 
+    public DataWord metadataPoolPartyA = new DataWord(HashUtil.sha3omit12("MetadataOfMiniContractPartyA".getBytes(Charset.forName("UTF-8"))));
+
+    public DataWord metadataPoolPartyB = new DataWord(HashUtil.sha3omit12("MetadataOfMiniContractPartyB".getBytes(Charset.forName("UTF-8"))));
     /*
     storage map of MiniContract
 
@@ -40,14 +44,19 @@ public class MiniContract {
 
      */
 
+    /*
+    storage map of Metadata of MiniContract, address is last20bytes of hash("MetadataOfMiniContractPartyA")
+
+    key addressOfOwner  number of MiniContract
+
+    key hash(addressOfOwner+indexOfnumberOfMiniContract) address
+     */
+
     public void miniContractCreate() {
         //api.program.transaction.getSender() should be our api-server
         byte[] ramdon = RLP.encodeList(api.program.transaction.getSender(), api.program.getStorage().getNonce(api.program.transaction.getSender()).toByteArray());
         byte[] account = HashUtil.sha3omit12(ramdon);
         api.program.getStorage().increaseNonce(api.program.transaction.getSender());
-
-        //log.debug("account : " + Hex.toHexString(account));
-
         Object[] params = api.getParams();
         String content = (String) params[0];
         api.setString(new DataWord(account), new DataWord(1000), content);
@@ -59,6 +68,21 @@ public class MiniContract {
         api.program.storageSave(new DataWord(account), new DataWord(601), new DataWord(0));
         String title = (String) params[3];
         api.setString(new DataWord(account), new DataWord(0), title);
+        //==update metadata of MiniContract pool
+        DataWord numberA = api.program.storageLoad(metadataPoolPartyA, new DataWord(partyA));
+        numberA = numberA == null ? new DataWord() : numberA;
+        BigInteger indexA = numberA.value();
+        numberA.add(new DataWord(1l));
+        api.program.storageSave(metadataPoolPartyA, new DataWord(partyA), numberA);
+        api.program.storageSave(metadataPoolPartyA, new DataWord(HashUtil.sha3(partyA, indexA.toByteArray())), new DataWord(account));
+
+        DataWord numberB = api.program.storageLoad(metadataPoolPartyB, new DataWord(partyB));
+        numberB = numberB == null ? new DataWord() : numberB;
+        BigInteger indexB = numberB.value();
+        numberB.add(new DataWord(1l));
+        api.program.storageSave(metadataPoolPartyB, new DataWord(partyB), numberB);
+        api.program.storageSave(metadataPoolPartyB, new DataWord(HashUtil.sha3(partyB, indexB.toByteArray())), new DataWord(account));
+        //=====================================
         List<DataWord> topics = new ArrayList<>();
         topics.add(new DataWord("miniContractCreate".getBytes(Charset.forName("UTF-8"))));
         LogInfo logInfo = new LogInfo(account, topics, account);
@@ -79,12 +103,8 @@ public class MiniContract {
         }
         String title = (String) params[1];
         api.setString(new DataWord(account), new DataWord(0), title);
-        byte[] partyA = (byte[]) params[2];
-        byte[] partyB = (byte[]) params[3];
-        api.program.storageSave(new DataWord(account), new DataWord(400), new DataWord(partyA));
-        api.program.storageSave(new DataWord(account), new DataWord(500), new DataWord(partyB));
         api.program.storageSave(new DataWord(account), new DataWord(501), new DataWord(0));
-        String content = (String) params[4];
+        String content = (String) params[2];
         api.setString(new DataWord(account), new DataWord(1000), content);
 
         List<DataWord> topics = new ArrayList<>();
@@ -133,7 +153,7 @@ public class MiniContract {
         return;
     }
 
-    public void miniContractGetAll() {
+    public void miniContractStatus() {
         Object[] params = api.getParams();
         byte[] account = (byte[]) params[0];
 
@@ -147,10 +167,52 @@ public class MiniContract {
         return;
     }
 
+    public void miniContractList() {
+        Object[] params = api.getParams();
+        byte[] owner = (byte[]) params[0];
+
+        DataWord numberA = api.program.storageLoad(metadataPoolPartyA, new DataWord(owner));
+        numberA = numberA == null ? new DataWord() : numberA;
+        BigInteger indexA = numberA.value();
+        List<byte[]> contractAddressPartyA = new ArrayList<>();
+        for (int i = 0; i < indexA.longValue(); i++) {
+            byte[] contractAddress = api.program.storageLoad(metadataPoolPartyA, new DataWord(HashUtil.sha3(owner, indexA.toByteArray()))).getData();
+            contractAddressPartyA.add(contractAddress);
+        }
+
+        DataWord numberB = api.program.storageLoad(metadataPoolPartyB, new DataWord(owner));
+        numberB = numberB == null ? new DataWord() : numberB;
+        BigInteger indexB = numberB.value();
+        List<byte[]> contractAddressPartyB = new ArrayList<>();
+        for (int i = 0; i < indexB.longValue(); i++) {
+            byte[] contractAddress = api.program.storageLoad(metadataPoolPartyB, new DataWord(HashUtil.sha3(owner, indexB.toByteArray()))).getData();
+            contractAddressPartyB.add(contractAddress);
+        }
+
+        api.setResult(new Object[]{contractAddressPartyA.toArray(), contractAddressPartyB.toArray()});
+        return;
+    }
+
     /*
     upload message to key-value server first and send message uuid to here
      */
     public void miniContractChat() {
+        Object[] params = api.getParams();
+        byte[] account = (byte[]) params[0];
+        byte[] talker = (byte[]) params[1];
+        String words = (String) params[2];
 
+        List<DataWord> topics = new ArrayList<>();
+        topics.add(new DataWord("miniContractChatFrom"));
+        LogInfo logInfo = new LogInfo(account, topics, talker);
+
+        List<DataWord> topics2 = new ArrayList<>();
+        topics2.add(new DataWord("miniContractChatWords"));
+        LogInfo logInfo2 = new LogInfo(account, topics2, words.getBytes(Charset.forName("UTF-8")));
+
+        List<LogInfo> logInfos = new ArrayList<>();
+        logInfos.add(logInfo);
+        logInfos.add(logInfo2);
+        api.program.getResult().addLogInfos(logInfos);
     }
 }

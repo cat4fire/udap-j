@@ -19,6 +19,15 @@ public class MiniCoin {
         this.api = api;
     }
 
+    public static long ADDRESS_OF_OWNERS = 0L;
+    public static long TITLE = 10000000000L;
+    public static long ISSUER = TITLE + 500L;
+    public static long LOGO = TITLE + 501L;
+    public static long COIN_ID = TITLE + 502L;
+    public static long FIXED = TITLE + 600L;
+    public static long TOTAL_MINT = TITLE + 601L;
+    public static long TRANSFERABLE = TITLE + 602L;
+    public static long CONTENT = TITLE + 1000L;
     /*
     storage map of MiniContract
 
@@ -34,8 +43,6 @@ public class MiniCoin {
     key 10^10 + 600 issue fixed or elastic  0 = elastic  n = fixed
     key 10^10 + 601 total mint
     key 10^10 + 602 transfer-able 1 = able
-
-    key 10^10 + 700 pointer to next mint coin
 
     key 10^10+1000 Content String length
     key 10^10+1000+1~10^10+1000+n    Content String, this Content is rich message.
@@ -61,32 +68,30 @@ public class MiniCoin {
 
         Object[] params = api.getParams();
         String content = (String) params[0];
-        api.setString(new DataWord(account), new DataWord(10000000000l + 1000), content);
+        api.setString(new DataWord(account), new DataWord(CONTENT), content);
         String title = (String) params[1];
-        api.setString(new DataWord(account), new DataWord(10000000000l), title);
+        api.setString(new DataWord(account), new DataWord(TITLE), title);
         byte[] logo = (byte[]) params[2];
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 501), new DataWord(logo));
+        api.program.storageSave(new DataWord(account), new DataWord(LOGO), new DataWord(logo));
         long fixed = (long) params[3];
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 600), new DataWord(fixed));
+        api.program.storageSave(new DataWord(account), new DataWord(FIXED), new DataWord(fixed));
         long transferable = (long) params[4];
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 602), new DataWord(transferable));
+        api.program.storageSave(new DataWord(account), new DataWord(TRANSFERABLE), new DataWord(transferable));
         byte[] issuer = (byte[]) params[5];
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 500), new DataWord(issuer));
+        api.program.storageSave(new DataWord(account), new DataWord(ISSUER), new DataWord(issuer));
 
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 601), new DataWord(0l));
+        api.program.storageSave(new DataWord(account), new DataWord(TOTAL_MINT), new DataWord(0l));
 
         Random r = new Random(System.currentTimeMillis());
-        long i = r.nextInt();//2^32 is less than 10^10 but currently it's enough
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 502), new DataWord(i));
-
-        api.program.storageSave(new DataWord(account), new DataWord(10000000000l + 700), new DataWord(0l));
+        long coinId = r.nextInt();//2^32 is less than 10^10 but currently it's enough
+        api.program.storageSave(new DataWord(account), new DataWord(COIN_ID), new DataWord(coinId));
 
         List<DataWord> topics = new ArrayList<>();
         topics.add(new DataWord("miniCoinCreate"));
         LogInfo logInfo = new LogInfo(account, topics, account);
         List<DataWord> topics2 = new ArrayList<>();
         topics2.add(new DataWord("miniCoinCreateCoinId"));
-        LogInfo logInfo2 = new LogInfo(account, topics2, BigInteger.valueOf(i).toByteArray());
+        LogInfo logInfo2 = new LogInfo(account, topics2, BigInteger.valueOf(coinId).toByteArray());
         List<LogInfo> logInfos = new ArrayList<>();
         logInfos.add(logInfo);
         logInfos.add(logInfo2);
@@ -99,13 +104,13 @@ public class MiniCoin {
         byte[] account = (byte[]) params[0];
         byte[] receiver = (byte[]) params[1];
         long amount = (long) params[2];
-        long pointer = api.program.storageLoad(new DataWord(account), new DataWord(10000000000l + 700)).longValue();
+        long totalMint = api.program.storageLoad(new DataWord(account), new DataWord(TOTAL_MINT)).longValue();
         List<LogInfo> logInfos = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
-            api.program.storageSave(new DataWord(account), new DataWord(0 + pointer + i), new DataWord(receiver));
-            List<DataWord> l = new ArrayList<>();
-            l.add(new DataWord("miniCoinMint"));
-            logInfos.add(new LogInfo(account, l, new DataWord(0 + pointer + i).getData()));
+            api.program.storageSave(new DataWord(account), new DataWord(ADDRESS_OF_OWNERS + totalMint + i), new DataWord(receiver));
+            List<DataWord> topic = new ArrayList<>();
+            topic.add(new DataWord("miniCoinMint"));
+            logInfos.add(new LogInfo(account, topic, new DataWord(ADDRESS_OF_OWNERS + totalMint + i).getData()));
         }
         api.program.getResult().addLogInfos(logInfos);
         return;
@@ -117,17 +122,17 @@ public class MiniCoin {
         long serial = (long) params[1];
         byte[] receiver = (byte[]) params[2];
 
-        DataWord previousOwner = api.program.storageLoad(new DataWord(account), new DataWord(0 + serial));
+        DataWord previousOwner = api.program.storageLoad(new DataWord(account), new DataWord(ADDRESS_OF_OWNERS + serial));
         if (previousOwner == null) {
             api.program.result.setRevert();
             return;
         }
-        api.program.storageSave(new DataWord(account), new DataWord(0 + serial), new DataWord(receiver));
+        api.program.storageSave(new DataWord(account), new DataWord(ADDRESS_OF_OWNERS + serial), new DataWord(receiver));
 
         List<LogInfo> logInfos = new ArrayList<>();
         List<DataWord> topics = new ArrayList<>();
         topics.add(new DataWord("miniCoinTransferSerial"));
-        logInfos.add(new LogInfo(account, topics, new DataWord(0 + serial).getData()));
+        logInfos.add(new LogInfo(account, topics, new DataWord(ADDRESS_OF_OWNERS + serial).getData()));
 
         List<DataWord> topics2 = new ArrayList<>();
         topics2.add(new DataWord("miniCoinTransferFrom"));
@@ -145,11 +150,27 @@ public class MiniCoin {
         Object[] params = api.getParams();
         byte[] account = (byte[]) params[0];
         long serial = (long) params[1];
-        DataWord owner = api.program.storageLoad(new DataWord(account), new DataWord(0 + serial));
+        DataWord owner = api.program.storageLoad(new DataWord(account), new DataWord(ADDRESS_OF_OWNERS + serial));
         if (owner == null) {
-            owner = new DataWord((byte[]) null);
+            owner = new DataWord();
         }
         api.setResult(new Object[]{owner.getLast20Bytes()});
+        return;
+    }
+
+    public void miniCoinStatus() {
+        Object[] params = api.getParams();
+        byte[] account = (byte[]) params[0];
+
+        String content = api.getString(new DataWord(account), new DataWord(CONTENT));
+        String title = api.getString(new DataWord(account), new DataWord(TITLE));
+        byte[] logo = api.program.storageLoad(new DataWord(account), new DataWord(LOGO)).getData();
+        long fixed = api.program.storageLoad(new DataWord(account), new DataWord(FIXED)).longValue();
+        long transferable = api.program.storageLoad(new DataWord(account), new DataWord(TRANSFERABLE)).longValue();
+        byte[] issuer = api.program.storageLoad(new DataWord(account), new DataWord(ISSUER)).getLast20Bytes();
+        long totalMint = api.program.storageLoad(new DataWord(account), new DataWord(TOTAL_MINT)).longValue();
+        long coinId = api.program.storageLoad(new DataWord(account), new DataWord(COIN_ID)).longValue();
+        api.setResult(new Object[]{content, title, logo, fixed, transferable, issuer, totalMint, coinId});
         return;
     }
 

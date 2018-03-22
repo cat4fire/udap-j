@@ -27,8 +27,6 @@ public enum ApiEnum {
             new String[]{
                     "address",//Minicontract to modify
                     "string", //content
-                    "address",//party A
-                    "address",//party B
                     "string",//title
             },
             new String[0])),
@@ -44,8 +42,8 @@ public enum ApiEnum {
                     "address",//Minicontract to confirm
             },
             new String[0])),
-    MiniContractGetAll("MiniContractGetAll", CallTransaction.Function.fromSignature(
-            "MiniContractGetAll",
+    MiniContractStatus("MiniContractStatus", CallTransaction.Function.fromSignature(
+            "MiniContractStatus",
             new String[]{
                     "address",//Minicontract to modify
             },
@@ -58,6 +56,23 @@ public enum ApiEnum {
                     "uint256",//abolished
 
             })),
+    MiniContractList("MiniContractList", CallTransaction.Function.fromSignature(
+            "MiniContractList",
+            new String[]{
+                    "address",//owner of Minicontracts
+            },
+            new String[]{
+                    "address[]",//address of Minicontracts whose party A is the given address
+                    "address[]",//address of Minicontracts whose party B is the given address
+            })),
+    MiniContractChat("MiniContractChat", CallTransaction.Function.fromSignature(
+            "MiniContractChat",
+            new String[]{
+                    "address",//Minicontract
+                    "address",//address of talker
+                    "string",//what you say
+            },
+            new String[0])),
     //====================================================================
 
     MiniCoinCreate("MiniCoinCreate", CallTransaction.Function.fromSignature(
@@ -96,6 +111,21 @@ public enum ApiEnum {
             },
             new String[]{
                     "address",//owner
+            })),
+    MiniCoinStatus("MiniCoinStatus", CallTransaction.Function.fromSignature(
+            "MiniCoinStatus",
+            new String[]{
+                    "address",//coin address
+            },
+            new String[]{
+                    "string", //content
+                    "string",//title
+                    "bytes32",//logo
+                    "uint256",//fixed , 0 for mintable and non-0 for fixed and represents its capacity
+                    "uint256",//transferable 0 for able and 1 for disable
+                    "address",//issuer
+                    "uint256",//total mint
+                    "uint256",//coin id
             })),;
 
     public String name;
@@ -144,9 +174,26 @@ public enum ApiEnum {
             case MiniContractCreate:
                 new MiniContract(api).miniContractCreate();
                 break;
-            case MiniContractGetAll:
-                new MiniContract(api).miniContractGetAll();
+            case MiniContractModify:
+                new MiniContract(api).miniContractModify();
                 break;
+            case MiniContractConfirm:
+                new MiniContract(api).miniContractConfirm();
+                break;
+            case MiniContractAbolish:
+                new MiniContract(api).miniContractAbolish();
+                break;
+            case MiniContractStatus:
+                new MiniContract(api).miniContractStatus();
+                break;
+            case MiniContractList:
+                new MiniContract(api).miniContractList();
+                break;
+            case MiniContractChat:
+                new MiniContract(api).miniContractChat();
+                break;
+
+
             default:
                 throw new RuntimeException("unknow Api");
         }
