@@ -2,6 +2,7 @@ package org.ethereum.vm;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.ethereum.core.CallTransaction;
+import org.ethereum.vm.applications.MiniCoin;
 import org.ethereum.vm.applications.MiniContract;
 import org.ethereum.vm.program.Program;
 
@@ -126,6 +127,22 @@ public enum ApiEnum {
                     "address",//issuer
                     "uint256",//total mint
                     "uint256",//coin id
+            })),
+    //===========================================================
+    GlobalChat("GlobalChat", CallTransaction.Function.fromSignature(
+            "GlobalChat",
+            new String[]{
+                    "address",//coin address
+            },
+            new String[]{
+                    "string", //content
+                    "string",//title
+                    "bytes32",//logo
+                    "uint256",//fixed , 0 for mintable and non-0 for fixed and represents its capacity
+                    "uint256",//transferable 0 for able and 1 for disable
+                    "address",//issuer
+                    "uint256",//total mint
+                    "uint256",//coin id
             })),;
 
     public String name;
@@ -191,6 +208,22 @@ public enum ApiEnum {
                 break;
             case MiniContractChat:
                 new MiniContract(api).miniContractChat();
+                break;
+//===============================================
+            case MiniCoinCreate:
+                new MiniCoin(api).miniCoinCreate();
+                break;
+            case MiniCoinMint:
+                new MiniCoin(api).miniCoinMint();
+                break;
+            case MiniCoinTransfer:
+                new MiniCoin(api).miniCoinTransfer();
+                break;
+            case MiniCoinSearch:
+                new MiniCoin(api).miniCoinSearch();
+                break;
+            case MiniCoinStatus:
+                new MiniCoin(api).miniCoinStatus();
                 break;
 
 

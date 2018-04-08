@@ -34,12 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.lang.Math.log;
 import static java.lang.Math.max;
 
 /**
@@ -81,6 +83,9 @@ public class BlockMiner {
     private long lastBlockMinedTime;
     private int UNCLE_LIST_LIMIT;
     private int UNCLE_GENERATION_LIMIT;
+
+    @Value("${iclass.mine.interval:0}")
+    public int interval;
 
     @Autowired
     public BlockMiner(final SystemProperties config, final CompositeEthereumListener listener,
@@ -254,7 +259,14 @@ public class BlockMiner {
 
     protected void restartMining() {
         Block newMiningBlock = getNewBlockForMining();
-
+        if (interval != 0) {
+            try {
+                Thread.sleep(interval * 1000);
+            } catch (InterruptedException e) {
+                logger.error("interval sleep interrupted, nothing wrong, goes on");
+                //e.printStackTrace();
+            }
+        }
         synchronized (this) {
             cancelCurrentBlock();
             miningBlock = newMiningBlock;
